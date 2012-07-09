@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Django DiveLog</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/divelog.css" rel="stylesheet">
+		{% block css %}{% endblock %}
+		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<a class="brand" href="#">Django DiveLog</a>
+					<div class="nav-collapse">
+						<ul class="nav">
+							<li{% if request.get_full_path == "/" %} class="active"{% endif %}><a href="/">Home</a></li>
+							<li{% if request.get_full_path == "/dives/" %} class="active"{% endif %}><a href="/dives">Dives</a></li>
+						</ul>
+					</div>
+					<div class="btn-group pull-right">
+					{% if user.is_authenticated %}
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							<i class="icon-user"></i> {{ user.username }}
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="/accounts/profile">Profile</a></li>
+							<li class="divider"></li>
+							<li><a href="/accounts/logout">Sign Out</a></li>
+						</ul>
+					{% else %}
+						<a href="/accounts/login">Log in</a> or <a href="/register">Register</a>
+					{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="container">
+			{% block content %}
+			{% endblock %}
+		</div>
+
+		<!-- Le javascript
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="{{ STATIC_URL }}js/jquery.js"></script>
+		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+		{% block js %}{% endblock %}
+
+	</body>
+</html>

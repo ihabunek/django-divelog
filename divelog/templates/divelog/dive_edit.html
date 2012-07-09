@@ -1,0 +1,28 @@
+{% extends "divelog/base.html" %}
+
+{% block title %}Edit teh dive{% endblock %}
+
+{% block content %}
+<h2>Edit dive #{{ dive_id }}</h2>
+<form class="form-horizontal" action="{{ request.get_full_path }}" method="post">
+	{% csrf_token %}
+	<fieldset>
+		{% for field in form %}
+		<div class="control-group{% if field.errors %} error{% endif %}">
+			<label class="control-label" for="id_{{ field.html_name }}">{{ field.label }}</label>
+			<div class="controls">
+				{{ field }}
+				{% for error in field.errors %}
+				<span class="help-inline">{{ error }}</span>
+				{% endfor %}
+			</div>
+			
+		</div>
+		{% endfor %}
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="Save" />
+			<a class="btn" href="{{ dive_url }}">Cancel</a>
+		</div>
+	</fieldset>
+</form>
+{% endblock %}

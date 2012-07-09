@@ -1,0 +1,8 @@
+body { padding-top: 60px; }
+.left { text-align: left; }
+.right { text-align: right; }
+.center { text-align: center; }
+
+.table th.left, .table td.left { text-align: left; }
+.table th.right, .table td.right { text-align: right; }
+.table th.center, .table td.center { text-align: center; }

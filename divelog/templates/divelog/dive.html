@@ -1,0 +1,130 @@
+{% extends "divelog/base.html" %}
+{% load divelog_filters %}
+
+{% block title %}Teh dive{% endblock %}
+
+{% block content %}
+<h2>Dive #{{ dive.number }}</h2>
+
+<table class="table table-bordered">
+	<tbody>
+		<tr>
+			<td>No.</td>
+			<td>{{ dive.number }}</td>
+		</tr>
+		<tr>
+			<td>Fingerprint</td>
+			<td>{{ dive.fingerprint }}</td>
+		</tr>
+		<tr>
+			<td>Size</td>
+			<td>{{ dive.size }} samples</td>
+		</tr>
+		<tr>
+			<td>Datetime</td>
+			<td>{{ dive.date_time|date:"d.m.Y. H:i:s" }}</td>
+		</tr>
+		<tr>
+			<td>Maximum depth</td>
+			<td>{{ dive.max_depth }}m</td>
+		</tr>
+		<tr>
+			<td>Duration</td>
+			<td>{{ dive.duration|formatTime }}</td>
+		</tr>
+	</tbody>
+</table>
+
+<a class="pull-right" href="edit">Edit dive</a>
+<a class="pull-left" href="/dives">&lt; Back to dives</a>
+
+<div id="dive_chart"></div>
+
+{% endblock %}
+
+{% block js %}
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+<script type="text/javascript">
+<!--
+$(function() {
+	var depthSeries = {{ chart.depth|jsonify|safe }};
+	var tempSeries = {{ chart.temperature|jsonify|safe }};
+	var events = {{ chart.events|jsonify|safe }};
+	
+	chart = new Highcharts.StockChart({
+		chart: {
+			renderTo: 'dive_chart',
+//			zoomType: 'x',
+			marginTop: 50,
+		},
+		
+		credits: {
+			enabled: false
+		},
+		
+		navigator: {
+			reversed: true,
+		},
+		
+		rangeSelector: {
+			enabled: false
+		},
+		
+		yAxis: [{
+			title: { text: 'Depth' },
+			min: 0,
+			reversed: true,
+		},{
+			title: { text: 'Temperature' },
+			opposite: true
+		}], 
+		
+		series: [{
+			name: 'Depth',
+			type: 'area',
+			data: depthSeries,
+			id: 'depthseries',
+			tooltip: {
+				pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} m</b><br/>',
+				valueDecimals: 2
+			},
+		},{
+			name: 'Temperature',
+			data: tempSeries,
+			yAxis: 1,
+			dashStyle: 'LongDash',
+			lineWidth: 1,
+			states: {
+				hover: {
+					lineWidth: 1
+				}
+			},
+			connectNulls: true,
+			tooltip: {
+				pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} °C</b><br/>',
+				valueDecimals: 1
+			},
+		}, {
+			name: 'Events',
+			type: 'flags',
+			data: events,
+			onSeries: 'depthseries',
+			tooltip: {
+			},
+		}],
+		exporting: {
+			buttons: {
+				printButton: {
+					enabled: false
+				},
+				exportButton: {
+					enabled: false
+				}
+			}
+		}
+	});
+});
+//-->
+</script>
+{% endblock %}
