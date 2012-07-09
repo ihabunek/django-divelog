@@ -7,7 +7,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^/?$', 'divelog.views.index'),
     url(r'^dives/?$', 'divelog.views.dives'),
-    url(r'^import/?$', 'divelog.views.import'),
+    url(r'^import/?$', 'divelog.views.dives_import'),
     url(r'^dive/(?P<dive_id>\d+)/$', 'divelog.views.dive'),
     url(r'^dive/(?P<dive_id>\d+)/edit/$', 'divelog.views.dive_edit'),
     
@@ -22,3 +22,6 @@ urlpatterns = patterns('',
 # for development, see:
 # https://docs.djangoproject.com/en/dev/howto/static-files/#staticfiles-development
 urlpatterns += staticfiles_urlpatterns()
+
+import logging
+logging.info(urlpatterns)
