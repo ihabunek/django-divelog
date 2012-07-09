@@ -1,0 +1,16 @@
+{% extends "divelog/base.html" %}
+
+{% block title %}Upload dives{% endblock %}
+
+{% block content %}
+
+<p>Currently, the only supported format is the XML export from 
+<a target="_blank" href="http://www.divesoftware.org/libdc/">libdivecomputer</a></p>
+
+<form enctype="multipart/form-data" action="{% url divelog.views.upload %}" method="post">
+	{% csrf_token %}
+	{{ form }}
+	<br />
+	<input type="submit" class="btn btn-primary" value="Upload" />
+</form>
+{% endblock %}

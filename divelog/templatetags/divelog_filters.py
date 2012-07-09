@@ -46,11 +46,9 @@ def gravatar_image(user, size=80):
     return url
 
 @register.simple_tag
-def gravatar_profile(user):
+def gravatar_profile(user, callback) :
     email = user.email.strip().lower()
     hash = md5.new(email).hexdigest()
-    url = "http://www.gravatar.com/%s.json" % hash
-    logging.info(email)
-    logging.info(hash)
-    logging.info(url)
+    url = "http://www.gravatar.com/%s.json?" % hash
+    url += urllib.urlencode({'callback': callback })
     return url

@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms.models import ModelForm
 from django.contrib.auth.models import User
+from django import forms
 
 class Dive(models.Model):
     user = models.ForeignKey(User)
@@ -21,9 +22,3 @@ class Event(models.Model):
     dive = models.ForeignKey(Dive)
     time = models.IntegerField()
     text = models.CharField(max_length = 128)
-
-class DiveForm(ModelForm):
-    class Meta:
-        model = Dive
-        exclude = ('number', 'fingerprint', 'size')
-        

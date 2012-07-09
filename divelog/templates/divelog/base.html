@@ -23,8 +23,10 @@
 					<a class="brand" href="#">Django DiveLog</a>
 					<div class="nav-collapse">
 						<ul class="nav">
-							<li{% if request.get_full_path == "/" %} class="active"{% endif %}><a href="/">Home</a></li>
-							<li{% if request.get_full_path == "/dives/" %} class="active"{% endif %}><a href="/dives">Dives</a></li>
+							<li><a href="{% url divelog.views.index %}">Home</a></li>
+							<li><a href="{% url divelog.views.dives %}">Dives</a></li>
+							<li><a href="{% url divelog.views.profile %}">Profile</a></li>
+							<li><a href="{% url divelog.views.upload %}">Upload</a></li>
 						</ul>
 					</div>
 					<div class="btn-group pull-right">
@@ -47,6 +49,7 @@
 		</div>
 		
 		<div class="container">
+			<h1>{% block title %}{% endblock %}</h1>
 			{% block content %}
 			{% endblock %}
 		</div>
@@ -56,6 +59,5 @@
 		<script src="{{ STATIC_URL }}js/jquery.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
 		{% block js %}{% endblock %}
-
 	</body>
 </html>

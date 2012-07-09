@@ -1,0 +1,30 @@
+{% extends "divelog/base.html" %}
+
+{% block title %}Review{% endblock %}
+
+{% block content %}
+<table class="table table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th>Number</th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+{% for dive in dives %}
+	<tr>
+		<td>{{ dive.number }}</td>
+		<td>{{ dive.datetime }}</td>
+		<td>{{ dive.divetime }}</td>
+		<td>{{ dive.fingerprint }}</td>
+		<td>{{ dive.maxdepth }}</td>
+	</tr>
+{% endfor %}
+</table>
+<pre>
+{{ file }}
+{{ dive_list }}
+</pre>
+{% endblock %}

@@ -1,26 +1,24 @@
 {% extends "divelog/base.html" %}
 {% load divelog_filters %}
 
+{% block title %}User profile{% endblock %}
+
+{% comment %}
 {% block js %}
 <script>
 	function processGravatar(profile)
 	{
 		console.log(profile);
 	}
-});
 </script>
+<script src="{% gravatar_profile user 'processGravatar' %}" type="text/javascript"></script>
 {% endblock %}
-<script src="http://www.gravatar.com/205e460b479e2e5b48aec07710c08d50.json?callback=processGravatar" type="text/javascript"></script>
+{% endcomment %}
 
 {% block content %}
-<table>
-	<tr>
-		<td>
-			<img src="{% gravatar_image user size=120 %}" alt="Avatar for {{user.first_name}}" />
-		</td>
-		<td valign="top">
-			{{ user.get_full_name }}
-		<td>
-	</tr>
-</table>
+<div class="profile">
+	<img src="{% gravatar_image user size=120 %}" alt="Avatar for {{user.first_name}}" />
+	<p>{{ user.get_full_name }}<br />
+	{{ user.email }}</p>
+</div>
 {% endblock %}

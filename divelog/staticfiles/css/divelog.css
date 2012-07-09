@@ -6,3 +6,7 @@ body { padding-top: 60px; }
 .table th.left, .table td.left { text-align: left; }
 .table th.right, .table td.right { text-align: right; }
 .table th.center, .table td.center { text-align: center; }
+
+.container h1,
+.container h2,
+.container h3 { margin-bottom: 20px; }

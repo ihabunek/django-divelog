@@ -1,15 +1,19 @@
-from divelog.models import Dive, DiveForm
-
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from datetime import timedelta
+from divelog.forms import DiveForm, UploadFileForm
+from divelog.models import Dive
+from divelog.parsers.libdc import parse_short
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
+from django.shortcuts import redirect
 from django.template import loader
 from django.template.context import RequestContext
-from datetime import timedelta
 from time import mktime
 import logging
 
 def index(request):
+    """
+    Title page view.
+    """
     t = loader.get_template('divelog/index.html')
     c = RequestContext(request);
     return HttpResponse(t.render(c))
@@ -23,17 +27,44 @@ def dives(request):
 
     t = loader.get_template('divelog/dives.html')
     c = RequestContext(request, {
-        'dives': dives,
-        'user': request.user
+        'dives': dives
     });
     return HttpResponse(t.render(c))
 
 @login_required
-def dives_import(request):
-	pass
-	
+def upload(request):
+    """
+    Allows user to upload dive computer data. 
+    """
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            ffile = request.FILES['file']
+            dive_data = '<dives>' + ffile.read() + '</dives>' # fix broken libdc xml format
+            dives = parse_short(dive_data)
+        else:
+            raise Exception("Error uploading file")
+
+        t = loader.get_template('divelog/upload_review.html')
+        c = RequestContext(request, {
+            'file': ffile,
+            'dives': dives
+        });
+        return HttpResponse(t.render(c))
+
+    else:
+        form = UploadFileForm()
+        t = loader.get_template('divelog/upload.html')
+        c = RequestContext(request, {
+            'form': form
+        });
+        return HttpResponse(t.render(c))
+
 @login_required
 def dive(request, dive_id):
+    """
+    Displays a single dive.
+    """
     try:
         dive = Dive.objects.get(pk = dive_id)
     except Dive.DoesNotExist:
@@ -76,6 +107,9 @@ def dive(request, dive_id):
 
 @login_required
 def dive_edit(request, dive_id):
+    """
+    View for editing dive data.
+    """
     dive_url = '/dive/%d' % int(dive_id)
     
     if request.method == 'POST':
@@ -98,22 +132,9 @@ def dive_edit(request, dive_id):
 
 @login_required
 def profile(request):
+    """
+    Displays user's profile.
+    """
     t = loader.get_template('accounts/profile.html')
-    c = RequestContext(request, {
-    });
-    return HttpResponse(t.render(c))
-	
-	
-@login_required
-def edit_dive(request):
-    """
-    Displays a list of user's dives.
-    """
-    dives = Dive.objects.all()
-
-    t = loader.get_template('divelog/dives.html')
-    c = RequestContext(request, {
-        'dives': dives,
-        'user': request.user
-    });
+    c = RequestContext(request);
     return HttpResponse(t.render(c))
