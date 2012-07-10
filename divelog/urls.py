@@ -6,12 +6,15 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^/?$', 'divelog.views.index'),
-    url(r'^dives/?$', 'divelog.views.dives'),
+    url(r'^dives/?$', 'divelog.views.dive_list'),
     url(r'^dives/new/?$', 'divelog.views.dive_add'),
-    url(r'^dive/(?P<dive_id>\d+)/$', 'divelog.views.dive'),
+    url(r'^dive/(?P<dive_id>\d+)/$', 'divelog.views.dive_view'),
     url(r'^dive/(?P<dive_id>\d+)/edit/$', 'divelog.views.dive_edit'),
 
-    url(r'^import/?$', 'divelog.views.upload'),
+    url(r'^uploads/$', 'divelog.views.upload_list'),
+    url(r'^upload/new/$', 'divelog.views.upload_add'),
+    url(r'^upload/import/$', 'divelog.views.upload_import'),
+    url(r'^upload/(?P<upload_id>\d+)/$', 'divelog.views.upload_view'),
     
     url(r'^accounts/login/?$', 'django.contrib.auth.views.login', { 'template_name': 'accounts/login.html'}),
     url(r'^accounts/logout/?$', 'django.contrib.auth.views.logout', { 'next_page': '/'}),

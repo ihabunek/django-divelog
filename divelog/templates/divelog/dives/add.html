@@ -3,6 +3,8 @@
 {% block title %}Add a new dive{% endblock %}
 
 {% block content %}
+{% include "divelog/messages.html" %}
+
 <form class="form-horizontal" action="{{ request.get_full_path }}" method="post">
 	{% csrf_token %}
 	<fieldset>

@@ -20,13 +20,12 @@
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container">
-					<a class="brand" href="#">Django DiveLog</a>
+					<a class="brand" href="{% url divelog.views.index %}">Django DiveLog</a>
 					<div class="nav-collapse">
 						<ul class="nav">
-							<li><a href="{% url divelog.views.index %}">Home</a></li>
-							<li><a href="{% url divelog.views.dives %}">Dives</a></li>
+							<li><a href="{% url divelog.views.dive_list %}">Dives</a></li>
 							<li><a href="{% url divelog.views.profile %}">Profile</a></li>
-							<li><a href="{% url divelog.views.upload %}">Upload</a></li>
+							<li><a href="{% url divelog.views.upload_list %}">Uploads</a></li>
 						</ul>
 					</div>
 					<div class="btn-group pull-right">

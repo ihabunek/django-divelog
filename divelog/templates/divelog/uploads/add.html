@@ -4,10 +4,12 @@
 
 {% block content %}
 
+{% include "divelog/messages.html" %}
+
 <p>Currently, the only supported format is the XML export from 
 <a target="_blank" href="http://www.divesoftware.org/libdc/">libdivecomputer</a></p>
 
-<form enctype="multipart/form-data" action="{% url divelog.views.upload %}" method="post">
+<form enctype="multipart/form-data" action="{% url divelog.views.upload_add %}" method="post">
 	{% csrf_token %}
 	{{ form }}
 	<br />

@@ -13,6 +13,7 @@ import math
 import md5
 import urllib
 import logging
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -52,3 +53,4 @@ def gravatar_profile(user, callback) :
     url = "http://www.gravatar.com/%s.json?" % hash
     url += urllib.urlencode({'callback': callback })
     return url
+
