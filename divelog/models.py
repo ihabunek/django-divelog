@@ -11,6 +11,7 @@ class Dive(models.Model):
     max_depth = models.FloatField()
     date_time = models.DateTimeField()
     duration = models.IntegerField()
+    comment = models.TextField(default='')
 
 class Sample(models.Model):
     dive = models.ForeignKey(Dive)

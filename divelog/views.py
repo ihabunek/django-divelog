@@ -3,6 +3,7 @@ from divelog.forms import DiveForm, UploadFileForm
 from divelog.models import Dive
 from divelog.parsers.libdc import parse_short
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.template import loader
@@ -129,6 +130,41 @@ def dive_edit(request, dive_id):
         'dive_url': dive_url,
     });
     return HttpResponse(t.render(c))
+    
+def dive_add(request):
+    """
+    View for adding a new dive.
+    """
+    if request.method == 'POST':
+        form = DiveForm(request.POST)
+        form.instance.user = request.user
+        form.instance.number = 1
+        form.instance.size = 0
+        
+        # t = loader.get_template('divelog/debug_form.html')
+        # c = RequestContext(request, {
+            # 'form': form,
+        # });
+        # return HttpResponse(t.render(c))
+
+        
+        
+        if form.is_valid():
+            new_dive = form.save()
+            
+            messages.success(request, "New dive successfully saved with id #%d." % new_dive.id)
+            return redirect('divelog.views.dive', dive_id = new_dive.id)
+        else:
+            messages.error(request, 'Failed saving dive.')
+    else:
+        form = DiveForm()
+    
+    t = loader.get_template('divelog/dive_add.html')
+    c = RequestContext(request, {
+        'form': form,
+    });
+    return HttpResponse(t.render(c))
+
 
 @login_required
 def profile(request):

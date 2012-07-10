@@ -3,7 +3,7 @@ from .dev import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/home/ihabunek/divelog.db',
+        'NAME': '/home/ihabunek/www/django_divelog/dev.db',
     }
 }
 

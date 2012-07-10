@@ -10,7 +10,7 @@ from divelog.models import Dive
 class DiveForm(ModelForm):
     class Meta:
         model = Dive
-        exclude = ('number', 'fingerprint', 'size')
+        exclude = ('number', 'fingerprint', 'size', 'user')
         
 class UploadFileForm(forms.Form):
     file = forms.FileField()

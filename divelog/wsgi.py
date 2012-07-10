@@ -14,6 +14,9 @@ framework.
 
 """
 import os
+import sys
+
+sys.path.append('/home/ihabunek/www/django_divelog')
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "divelog.settings")
 
