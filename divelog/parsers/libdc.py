@@ -29,9 +29,8 @@ def parse_full(path):
     with open(path, 'r') as file:
         for event, elem in cElementTree.iterparse(file):
             if elem.tag == "dive":
-                dive = parseDiveNode(elem)
+                dives.append(parseDiveNode(elem))
                 elem.clear()
-                dives.append(dive)
     return dives
 
 def parseDiveNode(diveNode):

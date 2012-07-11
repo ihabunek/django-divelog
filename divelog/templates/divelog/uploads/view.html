@@ -65,6 +65,7 @@
 	<p class="pull-right">
 		<button class="btn" onclick="$('input[type=checkbox]').attr('checked', true); return false;">All</button>
 		<button class="btn" onclick="$('input[type=checkbox]').attr('checked', false); return false;">None</button>
+		<button class="btn" onclick="$('input[type=checkbox]').each(function() { $(this).attr('checked', !$(this).attr('checked')); }); return false;">Toggle</button>
 	</p>
 	
 	<input type="submit" class="btn btn-primary" value="Import dives" />

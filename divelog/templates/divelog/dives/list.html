@@ -52,12 +52,17 @@ $(document).ready(function() {
 			<td>
 				<a href="{% url divelog.views.dive_view dive.id %}">View</a>
 				<a href="{% url divelog.views.dive_edit dive.id %}">Edit</a>
+				<a href="{% url divelog.views.dive_defunct dive.id %}">Trash</a>
 			</td>
 		</tr>
 	{% endfor %}
 	</tbody>
 </table>
 {% else %}
-<p>{% trans "You currently have no dives. Consider imp" %}</p>
+<p>You currently have no dives.</p>
+<ul>
+  <li><a href="{% url divelog.views.dive_add %}">Add a dive</a></li>
+  <li><a href="{% url divelog.views.upload_list %}">Upload divelog</a></li>
+</ul>
 {% endif %}
 {% endblock %}

@@ -1,19 +1,31 @@
 {% extends "divelog/base.html" %}
 
+{% block title %}Log in{% endblock %}
+
 {% block content %}
 
 {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
+<div class="alert alert-error">Your username and password didn't match. Please try again.</div>
 {% endif %}
 
-<form method="post" action="{% url django.contrib.auth.views.login %}">
+<form class="form-horizontal" method="post" action="{% url django.contrib.auth.views.login %}">
 {% csrf_token %}
-<table>
-{{ form.as_table }}
-</table>
-
-<input class="btn" type="submit" value="Login" />
-<input type="hidden" name="next" value="{{ next }}" />
+{% if next %}
+	<input type="hidden" name="next" value="{{ next }}" />
+{% endif %}
+{% for field in form %}
+	<div class="control-group">
+		<label class="control-label" for="id_{{ field.name }}">{{ field.label }}</label>
+		<div class="controls">
+			{{ field }}
+		</div>
+		{% if field.help_text %}
+		<span class="help-inline">{{ field.help_text }}</span>
+		{% endif %}
+	</div>
+{% endfor %}
+	<div class="form-actions">
+		<input class="btn btn-primary" type="submit" value="Login" />
+    </div>
 </form>
-
 {% endblock %}

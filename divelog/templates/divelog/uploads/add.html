@@ -5,14 +5,28 @@
 {% block content %}
 
 {% include "divelog/messages.html" %}
-
+<p>Here you can upload dive data exported from a dive computer.</p>
 <p>Currently, the only supported format is the XML export from 
 <a target="_blank" href="http://www.divesoftware.org/libdc/">libdivecomputer</a></p>
 
-<form enctype="multipart/form-data" action="{% url divelog.views.upload_add %}" method="post">
+<form class="form-horizontal" enctype="multipart/form-data" action="{% url divelog.views.upload_add %}" method="post">
 	{% csrf_token %}
-	{{ form }}
-	<br />
-	<input type="submit" class="btn btn-primary" value="Upload" />
+	<fieldset>
+		<legend>Choose a file to upload</legend>
+		{% for field in form %}
+		<div class="control-group{% if field.errors %} error{% endif %}">
+			<label class="control-label" for="id_{{ field.html_name }}">File</label>
+			<div class="controls">
+				{{ field }}
+				{% for error in field.errors %}
+				<span class="help-inline">{{ error }}</span>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+	</fieldset>
+	<div class="form-actions">
+		<input type="submit" class="btn btn-primary" value="Upload" />
+	</div>
 </form>
 {% endblock %}
