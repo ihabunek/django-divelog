@@ -42,6 +42,18 @@
 	</tbody>
 </table>
 
+{% if prev %}
+<a class="btn" href="{% url divelog.views.dive_view prev %}"><i class="icon-hand-left"></i> Previous</a>
+{% else %}
+<button class="btn" disabled="disabled"><i class="icon-hand-left"></i> Previous</button>
+{% endif %}
+
+{% if next %}
+<a class="btn" href="{% url divelog.views.dive_view next %}">Next <i class="icon-hand-right"></i></a>
+{% else %}
+<button class="btn" disabled="disabled">Next <i class="icon-hand-right"></i></button>
+{% endif %}
+
 {% if dive.size > 0 %}
 <div id="dive_chart"></div>
 {% else %}

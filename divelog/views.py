@@ -152,6 +152,16 @@ def dive_view(request, dive_id):
     except Dive.DoesNotExist:
         raise Http404
     
+    # Find next and previous dives
+    next = Dive.objects.filter(date_time__gt = dive.date_time).order_by('date_time')[0:1]
+    prev = Dive.objects.filter(date_time__lt = dive.date_time).order_by('-date_time')[0:1]
+    
+    next_id = next[0].id if next else None
+    prev_id = prev[0].id if prev else None
+
+    logging.debug(next)
+    logging.debug(prev) 
+    
     # Prepare chart data
     chart = {
         'depth': [],
@@ -183,7 +193,9 @@ def dive_view(request, dive_id):
     t = loader.get_template('divelog/dives/view.html')
     c = RequestContext(request, {
         'dive': dive,
-        'chart': chart
+        'chart': chart,
+        'next': next_id,
+        'prev': prev_id
     });
     return HttpResponse(t.render(c))
 
