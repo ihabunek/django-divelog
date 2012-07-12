@@ -1,0 +1,82 @@
+{% extends "divelog/base.html" %}
+
+{% block title %}Galleries{% endblock %}
+
+{% block content %}
+	{% include "divelog/messages.html" %}
+	<div class="form-inline">
+		<input type="text" id="username" placeholder="Enter a picasa username..." value="ivan.habunek" />
+		<button class="btn" onclick="fetchAlbums();">Find</button>
+	</div>
+	
+	<div id="picasa-user"></div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+function fetchAlbums()
+{
+	var username = $('#username').val();
+	if (username == '') {
+		return;
+	}
+	
+	$('#picasa-user').html('');
+	
+	var url = 'https://picasaweb.google.com/data/feed/api/user/' + username + '?alt=json&callback=?';
+	$.getJSON(url).success(function(data) {
+		showAlbums(data);
+	});
+	
+	/*
+	 * TODO: Error handling (complete/error callbacks) does not work with JSONP.
+	 * Try replacing with this: https://github.com/jaubourg/jquery-jsonp 
+	 */
+}
+
+function showAlbums(data)
+{
+	console.log(data.feed);
+	feed = data.feed;
+	
+	var author = {
+		name: feed.author[0].name.$t,
+		uri:  feed.author[0].uri.$t,
+		img:  feed.icon.$t,
+	};
+	
+	$('#picasa-user').append('<p><img src="' + author.img + '" /><a target="_blank" href="' + author.uri + '">' + feed.author[0].name.$t + '</a></p>');
+	$('#picasa-user').append('<table class="table table-bordered table-condensed"><colgroup><col style="width: 85px" /></colgroup><thead><tr><th>Thumb</th><th>Album name</th><th>Photos</th><th>Published</th></tr></thead><tbody></tbody></table>')
+	
+	for (key in feed.entry)
+	{
+		var entry = feed.entry[key];
+		var album = {
+			id:     entry.id.$t,
+			uri:   entry.link[1].href,
+			title: entry.title.$t,
+			count: entry.gphoto$numphotos.$t,
+			thumb: entry.media$group.media$thumbnail[0].url,
+			pub:   new Date(entry.published.$t),
+		}
+		$('#picasa-user tbody').append(
+			'<tr>' + 
+				'<td><img style="width: 80px" src="' + album.thumb + '" /></td>' + 
+				'<td><a href="' + album.uri + '">' + album.title + '</a></td>' + 
+				'<td>' + album.count + ' photos</td>' +
+				'<td>' + formatDate(album.pub) + '</td>' +
+			'</tr>'
+		);
+	}
+}
+
+function formatDate(date)
+{
+	var d = date.getDate();
+    var m = date.getMonth() + 1; // zero based
+    var y = date.getFullYear();
+    return(d + "." + m + "." + y + ".");	
+}
+
+</script>
+{% endblock %}

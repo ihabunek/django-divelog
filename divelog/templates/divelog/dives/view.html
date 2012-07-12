@@ -4,66 +4,66 @@
 {% block title %}Dive #{{ dive.number }}{% endblock %}
 
 {% block content %}
-{% include "divelog/messages.html" %}
-<table class="table table-bordered">
-	<colgroup>
-		<col class="span3" />
-		<col />
-	</colgroup>
-	<tbody>
-		<tr>
-			<th>No.</th>
-			<td>{{ dive.number }}</td>
-		</tr>
-		<tr>
-			<th>Fingerprint</th>
-			<td>{{ dive.fingerprint }}</td>
-		</tr>
-		<tr>
-			<th>Size</th>
-			<td>{{ dive.size }} samples</td>
-		</tr>
-		<tr>
-			<th>Datetime</th>
-			<td>{{ dive.date_time|date:"d.m.Y. H:i:s" }}</td>
-		</tr>
-		<tr>
-			<th>Maximum depth</th>
-			<td>{{ dive.max_depth }}m</td>
-		</tr>
-		<tr>
-			<th>Duration</th>
-			<td>{{ dive.duration|formatTime }}</td>
-		</tr>
-		<tr>
-			<th>Description</th>
-			<td>{{ dive.comment }}</td>
-		</tr>
-	</tbody>
-</table>
-
-{% if prev %}
-<a class="btn" href="{% url divelog.views.dive_view prev %}"><i class="icon-hand-left"></i> Previous</a>
-{% else %}
-<button class="btn" disabled="disabled"><i class="icon-hand-left"></i> Previous</button>
-{% endif %}
-
-{% if next %}
-<a class="btn" href="{% url divelog.views.dive_view next %}">Next <i class="icon-hand-right"></i></a>
-{% else %}
-<button class="btn" disabled="disabled">Next <i class="icon-hand-right"></i></button>
-{% endif %}
-
-{% if dive.size > 0 %}
-<div id="dive_chart"></div>
-{% else %}
-<p>This dive has no profile information.</p>
-{% endif %}
-
-<a class="pull-right" href="edit">Edit dive</a>
-<a class="pull-left" href="/dives">&lt; Back to dives</a>
-<div style="clear: both"></div>
-
+	{% include "divelog/messages.html" %}
+	<table class="table table-bordered">
+		<colgroup>
+			<col class="span3" />
+			<col />
+		</colgroup>
+		<tbody>
+			<tr>
+				<th>No.</th>
+				<td>{{ dive.number }}</td>
+			</tr>
+			<tr>
+				<th>Fingerprint</th>
+				<td>{{ dive.fingerprint }}</td>
+			</tr>
+			<tr>
+				<th>Size</th>
+				<td>{{ dive.size }} samples</td>
+			</tr>
+			<tr>
+				<th>Datetime</th>
+				<td>{{ dive.date_time|date:"d.m.Y. H:i:s" }}</td>
+			</tr>
+			<tr>
+				<th>Maximum depth</th>
+				<td>{{ dive.max_depth }}m</td>
+			</tr>
+			<tr>
+				<th>Duration</th>
+				<td>{{ dive.duration|formatTime }}</td>
+			</tr>
+			<tr>
+				<th>Description</th>
+				<td>{{ dive.comment }}</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<div class="pull-right">
+		<a class="btn" href="{% url divelog.views.dive_edit dive.id %}"><i class="icon-edit"></i> Edit</a>
+		<a class="btn" href="{% url divelog.views.dive_trash dive.id %}" onclick="return confirm('Are you sure you want to delete this dive?')"><i class="icon-trash"></i> Trash</a>
+	</div>
+	
+	{% if prev %}
+		<a class="btn" href="{% url divelog.views.dive_view prev %}"><i class="icon-hand-left"></i> Previous</a>
+	{% else %}
+		<button class="btn" disabled="disabled"><i class="icon-hand-left"></i> Previous</button>
+	{% endif %}
+	
+	{% if next %}
+		<a class="btn" href="{% url divelog.views.dive_view next %}">Next <i class="icon-hand-right"></i></a>
+	{% else %}
+		<button class="btn" disabled="disabled">Next <i class="icon-hand-right"></i></button>
+	{% endif %}
+	
+	{% if dive.size > 0 %}
+		<div id="dive_chart"></div>
+	{% else %}
+		<p>This dive has no profile information.</p>
+	{% endif %}
 {% endblock %}
 
 {% block js %}
@@ -72,11 +72,41 @@
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 <script type="text/javascript">
 <!--
-$(function() {
-	var depthSeries = {{ chart.depth|jsonify|safe }};
-	var tempSeries = {{ chart.temperature|jsonify|safe }};
-	var events = {{ chart.events|jsonify|safe }};
+
+var depthSeries = [];
+var tempSeries = [];
+var eventSeries = [];
+
+$(document).ready(function() {
+	// Fetch dive samples
+	var diveReq = $.getJSON('{% url divelog.views.dive_samples_json dive.id %}', function(data) {
+		for (key in data)
+		{
+			time = data[key][0] * 1000 // time in ms
+			depthSeries.push([time, data[key][1]]);
+			tempSeries.push([time, data[key][2]]);
+		}
+	});
 	
+	// Fetch dive events
+	var eventReq = $.getJSON('{% url divelog.views.dive_events_json dive.id %}', function(data) {
+		for (key in data)
+		{
+			eventSeries.push([
+				data[key][0] * 1000, // time in ms 
+				data[key][1]
+			]);
+		}
+	});
+	
+	// When all data is laded, draw the chart.
+	$.when(diveReq, eventReq).then(function() {
+		drawChart();
+	});
+});	
+
+function drawChart() 
+{
 	chart = new Highcharts.StockChart({
 		chart: {
 			renderTo: 'dive_chart',
@@ -97,13 +127,23 @@ $(function() {
 		},
 		
 		yAxis: [{
-			title: { text: 'Depth' },
 			min: 0,
 			reversed: true,
+			labels: {
+				formatter: function() {
+					if (this.value == 0) return '';
+					return this.value + ' m';
+				}
+			}
 		},{
-			title: { text: 'Temperature' },
-			opposite: true
-		}], 
+			opposite: true,
+			labels: {
+				formatter: function() {
+					if (this.value == 0) return '';
+					return this.value + '°C';
+				}
+			}
+		}],
 		
 		series: [{
 			name: 'Depth',
@@ -125,18 +165,16 @@ $(function() {
 					lineWidth: 1
 				}
 			},
-			connectNulls: true,
 			tooltip: {
-				pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} °C</b><br/>',
+				pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}°C</b><br/>',
 				valueDecimals: 1
 			},
-		}, {
+			connectNulls: true,
+		},{
 			name: 'Events',
 			type: 'flags',
-			data: events,
+			data: eventSeries,
 			onSeries: 'depthseries',
-			tooltip: {
-			},
 		}],
 		exporting: {
 			buttons: {
@@ -149,7 +187,7 @@ $(function() {
 			}
 		}
 	});
-});
+}
 //-->
 </script>
 {% endif %}

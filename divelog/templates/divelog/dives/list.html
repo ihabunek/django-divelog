@@ -52,7 +52,7 @@ $(document).ready(function() {
 			<td>
 				<a href="{% url divelog.views.dive_view dive.id %}">View</a>
 				<a href="{% url divelog.views.dive_edit dive.id %}">Edit</a>
-				<a href="{% url divelog.views.dive_defunct dive.id %}">Trash</a>
+				<a href="{% url divelog.views.dive_trash dive.id %}">Trash</a>
 			</td>
 		</tr>
 	{% endfor %}

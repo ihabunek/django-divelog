@@ -4,12 +4,13 @@ from divelog.models import Dive, DiveUpload, Sample, Event
 from divelog.parsers.libdc import parse_short, parse_full
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.db import transaction
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.template import loader
 from django.template.context import RequestContext
-from django.utils import timezone
+from django.utils import timezone, simplejson
 from django.views.decorators.cache import never_cache
 from time import mktime
 import logging
@@ -23,6 +24,15 @@ def index(request):
     t = loader.get_template('divelog/index.html')
     c = RequestContext(request);
     return HttpResponse(t.render(c))
+
+def gallery(request):
+    """
+    Gallery trial.
+    """
+    t = loader.get_template('divelog/gallery.html')
+    c = RequestContext(request);
+    return HttpResponse(t.render(c))
+
 
 @login_required
 @never_cache
@@ -152,50 +162,15 @@ def dive_view(request, dive_id):
     except Dive.DoesNotExist:
         raise Http404
     
-    # Find next and previous dives
+    # Find next and previous dives (if any exist)
     next = Dive.objects.filter(date_time__gt = dive.date_time).order_by('date_time')[0:1]
     prev = Dive.objects.filter(date_time__lt = dive.date_time).order_by('-date_time')[0:1]
-    
-    next_id = next[0].id if next else None
-    prev_id = prev[0].id if prev else None
-
-    logging.debug(next)
-    logging.debug(prev) 
-    
-    # Prepare chart data
-    chart = {
-        'depth': [],
-        'temperature': [],
-        'events': []
-    }
-    
-    last_temp = None
-    
-    for sample in dive.sample_set.all():
-        delta = timedelta(seconds = sample.time)
-        sample_time = dive.date_time + delta
-        sample_ts = int(1000 * mktime(sample_time.timetuple()))
-        
-        if sample.temperature:
-            last_temp = sample.temperature
-        
-        chart['depth'].append([sample_ts, sample.depth])
-        chart['temperature'].append([sample_ts, last_temp])
-        
-    for event in dive.event_set.all():
-        delta = timedelta(seconds = event.time)
-        event_time = dive.date_time + delta
-        chart['events'].append({
-            'x': int(1000 * mktime(event_time.timetuple())),
-            'title': event.text
-        })
     
     t = loader.get_template('divelog/dives/view.html')
     c = RequestContext(request, {
         'dive': dive,
-        'chart': chart,
-        'next': next_id,
-        'prev': prev_id
+        'next': next[0].id if next else None,
+        'prev': prev[0].id if prev else None
     });
     return HttpResponse(t.render(c))
 
@@ -240,9 +215,9 @@ def dive_edit(request, dive_id):
 
 @login_required
 @never_cache
-def dive_defunct(request, dive_id):
+def dive_trash(request, dive_id):
     """
-    Defuncts a dive (changes dive status to D).
+    Moves a dive to trash (changes dive status to D).
     """
     try:
         dive = Dive.objects.get(pk = dive_id)
@@ -257,13 +232,13 @@ def dive_defunct(request, dive_id):
     dive.status = 'D'
     dive.save()
     
-    undo_url = reverse('divelog.views.dive_activate', args=[dive_id])
+    undo_url = reverse('divelog.views.dive_restore', args=[dive_id])
     messages.success(request, 'Dive #%d moved to trash. <a href="%s">Undo</a>' % (int(dive_id), undo_url))
     return redirect('divelog.views.dive_list')
 
 @login_required
 @never_cache
-def dive_activate(request, dive_id):
+def dive_restore(request, dive_id):
     try:
         dive = Dive.objects.get(pk = dive_id)
     except Dive.DoesNotExist:
@@ -306,6 +281,47 @@ def dive_add(request):
         'form': form,
     });
     return HttpResponse(t.render(c))
+
+@login_required
+def dive_samples_json(request, dive_id):
+    """
+    Returns dive samples in JSON format.
+    """
+    try:
+        dive = Dive.objects.get(pk = dive_id)
+    except Dive.DoesNotExist:
+        raise Http404
+    
+    if dive.user != request.user:
+        raise Http404
+    
+    samples = simplejson.dumps([[
+        sample.time,
+        sample.depth, 
+        sample.temperature
+    ] for sample in dive.sample_set.all()] )
+    
+    return HttpResponse(samples, mimetype="application/json")
+
+@login_required
+def dive_events_json(request, dive_id):
+    """
+    Returns dive events in JSON format.
+    """
+    try:
+        dive = Dive.objects.get(pk = dive_id)
+    except Dive.DoesNotExist:
+        raise Http404
+    
+    if dive.user != request.user:
+        raise Http404
+    
+    samples = simplejson.dumps([[
+        event.time,
+        event.text, 
+    ] for event in dive.event_set.all()] )
+    
+    return HttpResponse(samples, mimetype="application/json")
 
 @login_required
 def profile(request):
