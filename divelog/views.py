@@ -91,7 +91,6 @@ def upload_view(request, upload_id):
 @never_cache
 def upload_import(request):
     if request.method == 'POST':
-        
         # Provided fingerprints identify dives which should be imported
         fingerprints = request.POST.getlist('fingerprints')
         upload_id = request.POST.get('upload_id')
@@ -100,10 +99,11 @@ def upload_import(request):
             upload = DiveUpload.objects.get(pk = upload_id)
             logging.debug("Parsing dives from upload #%d" % int(upload_id))
 
-            # TODO: Parse only requested files 
+            # TODO: Parse only requested dives to improve performance
             dives = parse_full(upload.data.path)
             logging.debug("Parsed %d dives" % len(dives))            
 
+            # Save parsed dives
             count = 0
             for dive, samples, events in dives:
                 if dive.fingerprint in fingerprints:
@@ -115,11 +115,10 @@ def upload_import(request):
             return redirect('divelog.views.dive_list')
             
         except Exception as ex:
-            logging.error(ex)
             messages.error(request, "Import failed")
-        
-    else:
-        messages.error(request, 'Import failed')
+            return redirect('divelog.views.upload_view', upload_id = upload_id)
+    
+        raise Http404
         
     t = loader.get_template('divelog/uploads/import.html')
     c = RequestContext(request, {})

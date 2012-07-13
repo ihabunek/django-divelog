@@ -20,7 +20,7 @@
 		{% endfor %}
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="Save" />
-			<a class="btn" href="{{ dive_url }}">Cancel</a>
+			<a class="btn" href="{% url divelog.views.dive_view form.instance.id %}">Cancel</a>
 		</div>
 	</fieldset>
 </form>
