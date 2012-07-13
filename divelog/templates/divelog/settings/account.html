@@ -1,0 +1,24 @@
+{% extends "divelog/settings/base.html" %}
+
+{% block settings_contents %}
+<form class="form-horizontal" action="{{ request.get_full_path }}" method="post">
+	{% csrf_token %}
+	<fieldset>
+		<legend>Account settings</legend>
+		{% for field in form %}
+		<div class="control-group{% if field.errors %} error{% endif %}">
+			<label class="control-label" for="id_{{ field.html_name }}">{{ field.label }}</label>
+			<div class="controls">
+				{{ field }}
+				{% for error in field.errors %}
+				<span class="help-inline">{{ error }}</span>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="Save" />
+		</div>
+	</fieldset>
+</form>
+{% endblock %}

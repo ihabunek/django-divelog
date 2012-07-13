@@ -4,16 +4,13 @@ Created on 4. 7. 2012.
 @author: ihabunek
 '''
 
+from django import template
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.utils import simplejson
-from django import template
-
 import math
 import md5
 import urllib
-import logging
-from django.utils.safestring import mark_safe
 
 register = template.Library()
 

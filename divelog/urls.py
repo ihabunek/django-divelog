@@ -8,6 +8,10 @@ urlpatterns = patterns('',
     url(r'^/?$', 'divelog.views.index'),
     url(r'^gallery/$', 'divelog.views.gallery'),
     
+    url(r'^settings/$', 'divelog.views.settings'),
+    url(r'^settings/account/$', 'divelog.views.settings_account'),
+    url(r'^settings/password/$', 'divelog.views.settings_password'),
+    
     url(r'^dives/?$', 'divelog.views.dive_list'),
     url(r'^dives/new/?$', 'divelog.views.dive_add'),
     
