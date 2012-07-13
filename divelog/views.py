@@ -1,10 +1,9 @@
-from datetime import timedelta
 from divelog.forms import DiveForm, DiveUploadForm
 from divelog.models import Dive, DiveUpload, Sample, Event
 from divelog.parsers.libdc import parse_short, parse_full
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
@@ -12,27 +11,17 @@ from django.template import loader
 from django.template.context import RequestContext
 from django.utils import timezone, simplejson
 from django.views.decorators.cache import never_cache
-from time import mktime
-import logging
-import os
-from django.core.urlresolvers import reverse
+import logging, os
 
 def index(request):
-    """
-    Title page view.
-    """
     t = loader.get_template('divelog/index.html')
     c = RequestContext(request);
     return HttpResponse(t.render(c))
 
 def gallery(request):
-    """
-    Gallery trial.
-    """
     t = loader.get_template('divelog/gallery.html')
     c = RequestContext(request);
     return HttpResponse(t.render(c))
-
 
 @login_required
 @never_cache
@@ -54,7 +43,7 @@ def upload_add(request):
         'form': form
     });
     return HttpResponse(t.render(c))
-
+ 
 @login_required
 def upload_list(request):
     uploads = DiveUpload.objects.filter(user = request.user)
@@ -162,9 +151,12 @@ def dive_view(request, dive_id):
     except Dive.DoesNotExist:
         raise Http404
     
+    if dive.user != request.user:
+        raise Http404
+    
     # Find next and previous dives (if any exist)
-    next = Dive.objects.filter(date_time__gt = dive.date_time).order_by('date_time')[0:1]
-    prev = Dive.objects.filter(date_time__lt = dive.date_time).order_by('-date_time')[0:1]
+    next = Dive.objects.filter(user = request.user, date_time__gt = dive.date_time).order_by('date_time')[0:1]
+    prev = Dive.objects.filter(user = request.user, date_time__lt = dive.date_time).order_by('-date_time')[0:1]
     
     t = loader.get_template('divelog/dives/view.html')
     c = RequestContext(request, {
