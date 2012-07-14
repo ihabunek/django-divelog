@@ -66,6 +66,15 @@ def parseDiveNode(diveNode):
         else:
             logging.warning("unknown node: %s" % node.toxml())
     
+    # For some computers, temperatures are inserted on change only, so some 
+    # samples don't have a temperature. In those cases, copy the previous 
+    # sample's temparature.
+    previous = None
+    for sample in samples:
+        if sample.temperature == None and previous != None:
+            sample.temperature = previous.temperature
+        previous = sample
+    
     return (dive, samples, events)
 
 def parseSampleNode(sampleNode):
@@ -85,9 +94,9 @@ def parseSampleNode(sampleNode):
             pass
         elif node.tag == 'event':
             event = Event()
-            event.time = int(node.attributes['time'].value) # time within sample
+            event.time = int(node.get('time')) # time within sample
             event.time += sample.time # add sample time to get actual time in dive
-            event.text = node.childNodes[0].nodeValue
+            event.text = node.text
             
             if event.text != 'unknown':
                 events.append(event)

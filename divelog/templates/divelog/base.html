@@ -7,7 +7,7 @@
 		<meta name="description" content="">
 		<meta name="author" content="">
 
-		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
 		<link href="{{ STATIC_URL }}css/divelog.css" rel="stylesheet">
 		{% block css %}{% endblock %}
 		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -34,12 +34,13 @@
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="/accounts/profile">Profile</a></li>
+							<li><a href="{% url divelog.views.settings %}">Settings</a></li>
+							<li><a href="{% url divelog.views.profile %}">Profile</a></li>
 							<li class="divider"></li>
-							<li><a href="/accounts/logout">Sign Out</a></li>
+							<li><a href="{% url django.contrib.auth.views.logout %}">Sign Out</a></li>
 						</ul>
 					{% else %}
-						<a href="/accounts/login">Log in</a> or <a href="/register">Register</a>
+						<a class="btn" href="/accounts/login">Log in</a>
 					{% endif %}
 					</div>
 				</div>
@@ -48,6 +49,7 @@
 		
 		<div class="container">
 			<h1>{% block title %}{% endblock %}</h1>
+			{% include "divelog/messages.html" %}
 			{% block content %}
 			{% endblock %}
 		</div>
@@ -55,7 +57,7 @@
 		<!-- Le javascript
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script src="{{ STATIC_URL }}js/jquery.js"></script>
-		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+		<script src="{{ STATIC_URL }}vendor/bootstrap/js/bootstrap.js"></script>
 		{% block js %}{% endblock %}
 	</body>
 </html>

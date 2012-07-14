@@ -1,10 +1,9 @@
-from datetime import timedelta
-from divelog.forms import DiveForm, DiveUploadForm
+from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, ValidatingPasswordChangeForm
 from divelog.models import Dive, DiveUpload, Sample, Event
 from divelog.parsers.libdc import parse_short, parse_full
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
@@ -12,27 +11,18 @@ from django.template import loader
 from django.template.context import RequestContext
 from django.utils import timezone, simplejson
 from django.views.decorators.cache import never_cache
-from time import mktime
 import logging
 import os
-from django.core.urlresolvers import reverse
 
 def index(request):
-    """
-    Title page view.
-    """
     t = loader.get_template('divelog/index.html')
     c = RequestContext(request);
     return HttpResponse(t.render(c))
 
 def gallery(request):
-    """
-    Gallery trial.
-    """
     t = loader.get_template('divelog/gallery.html')
     c = RequestContext(request);
     return HttpResponse(t.render(c))
-
 
 @login_required
 @never_cache
@@ -54,7 +44,7 @@ def upload_add(request):
         'form': form
     });
     return HttpResponse(t.render(c))
-
+ 
 @login_required
 def upload_list(request):
     uploads = DiveUpload.objects.filter(user = request.user)
@@ -102,7 +92,6 @@ def upload_view(request, upload_id):
 @never_cache
 def upload_import(request):
     if request.method == 'POST':
-        
         # Provided fingerprints identify dives which should be imported
         fingerprints = request.POST.getlist('fingerprints')
         upload_id = request.POST.get('upload_id')
@@ -111,10 +100,11 @@ def upload_import(request):
             upload = DiveUpload.objects.get(pk = upload_id)
             logging.debug("Parsing dives from upload #%d" % int(upload_id))
 
-            # TODO: Parse only requested files 
+            # TODO: Parse only requested dives to improve performance
             dives = parse_full(upload.data.path)
             logging.debug("Parsed %d dives" % len(dives))            
 
+            # Save parsed dives
             count = 0
             for dive, samples, events in dives:
                 if dive.fingerprint in fingerprints:
@@ -126,11 +116,10 @@ def upload_import(request):
             return redirect('divelog.views.dive_list')
             
         except Exception as ex:
-            logging.error(ex)
             messages.error(request, "Import failed")
-        
-    else:
-        messages.error(request, 'Import failed')
+            return redirect('divelog.views.upload_view', upload_id = upload_id)
+    
+        raise Http404
         
     t = loader.get_template('divelog/uploads/import.html')
     c = RequestContext(request, {})
@@ -162,9 +151,12 @@ def dive_view(request, dive_id):
     except Dive.DoesNotExist:
         raise Http404
     
+    if dive.user != request.user:
+        raise Http404
+    
     # Find next and previous dives (if any exist)
-    next = Dive.objects.filter(date_time__gt = dive.date_time).order_by('date_time')[0:1]
-    prev = Dive.objects.filter(date_time__lt = dive.date_time).order_by('-date_time')[0:1]
+    next = Dive.objects.filter(user = request.user, date_time__gt = dive.date_time).order_by('date_time')[0:1]
+    prev = Dive.objects.filter(user = request.user, date_time__lt = dive.date_time).order_by('-date_time')[0:1]
     
     t = loader.get_template('divelog/dives/view.html')
     c = RequestContext(request, {
@@ -330,4 +322,39 @@ def profile(request):
     """
     t = loader.get_template('accounts/profile.html')
     c = RequestContext(request);
+    return HttpResponse(t.render(c))
+
+def settings(request):
+    return redirect('divelog.views.settings_account')
+
+@login_required
+def settings_account(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your settings have been saved.")
+    else:
+        form = UserProfileForm(instance=request.user)
+    
+    t = loader.get_template('divelog/settings/account.html')
+    c = RequestContext(request, {
+        'form': form,
+    });
+    return HttpResponse(t.render(c))
+
+@login_required
+def settings_password(request):
+    if request.method == 'POST':
+        form = ValidatingPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Password changed.")
+    else:
+        form = ValidatingPasswordChangeForm(request.user)
+    
+    t = loader.get_template('divelog/settings/password.html')
+    c = RequestContext(request, {
+        'form': form,
+    });
     return HttpResponse(t.render(c))

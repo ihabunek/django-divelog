@@ -3,22 +3,11 @@
 
 {% block title %}User profile{% endblock %}
 
-{% comment %}
-{% block js %}
-<script>
-	function processGravatar(profile)
-	{
-		console.log(profile);
-	}
-</script>
-<script src="{% gravatar_profile user 'processGravatar' %}" type="text/javascript"></script>
-{% endblock %}
-{% endcomment %}
-
 {% block content %}
-<div class="profile">
-	<img src="{% gravatar_image user size=120 %}" alt="Avatar for {{user.first_name}}" />
-	<p>{{ user.get_full_name }}<br />
-	{{ user.email }}</p>
-</div>
+	{% include "divelog/messages.html" %}
+	<div class="profile">
+		<img src="{% gravatar_image user size=120 %}" alt="Avatar for {{user.first_name}}" />
+		<p>{{ user.get_full_name }}<br />
+		{{ user.email }}</p>
+	</div>
 {% endblock %}

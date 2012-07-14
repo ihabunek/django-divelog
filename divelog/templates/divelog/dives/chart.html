@@ -1,0 +1,131 @@
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+<script type="text/javascript">
+<!--
+
+var depthSeries = [];
+var tempSeries = [];
+var eventSeries = [];
+
+$(document).ready(function() {
+	// Fetch dive samples
+	var diveReq = $.getJSON('{% url divelog.views.dive_samples_json dive.id %}', function(data) {
+		for (key in data)
+		{
+			time = data[key][0] * 1000 // time in ms
+			depthSeries.push([time, -1 * data[key][1]]);
+			tempSeries.push([time, data[key][2]]);
+		}
+	});
+	
+	// Fetch dive events
+	var eventReq = $.getJSON('{% url divelog.views.dive_events_json dive.id %}', function(data) {
+		for (key in data)
+		{
+			eventSeries.push({
+				x: data[key][0] * 1000, // time in ms 
+				title: data[key][1]
+			});
+		}
+	});
+	
+	// When all data is laded, draw the chart.
+	$.when(diveReq, eventReq).then(function() {
+		drawChart();
+	});
+});	
+
+function drawChart() 
+{
+	chart = new Highcharts.StockChart({
+		chart: {
+			renderTo: 'dive_chart',
+			zoomType: 'x',
+			marginTop: 50,
+			alignTicks: false,
+		},
+		
+		credits: {
+			enabled: false
+		},
+		
+		navigator: {
+			reversed: true,
+		},
+		
+		rangeSelector: {
+			enabled: false
+		},
+		tooltip: {
+			xDateFormat: '%H:%M:%S'
+		},
+		plotOptions: {
+			series: {
+				dataGrouping: {
+					enabled: false
+				}
+			}
+		},
+		yAxis: [{
+			max: 0,
+			labels: {
+				formatter: function() {
+					if (this.value == 0) return '';
+					return (-1 * this.value) + ' m';
+				}
+			},
+		},{
+			opposite: true,
+			labels: {
+				formatter: function() {
+					return;
+				}
+			},
+			gridLineWidth: 0,
+		}],
+		
+		series: [{
+			name: 'Depth',
+			type: 'area',
+			data: depthSeries,
+			id: 's1',
+			tooltip: {
+				pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} m</b><br/>',
+				valueDecimals: 2
+			},
+		},{
+			name: 'Temperature',
+			data: tempSeries,
+			yAxis: 1,
+			dashStyle: 'LongDash',
+			lineWidth: 1,
+			states: {
+				hover: {
+					lineWidth: 1
+				}
+			},
+			tooltip: {
+				pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}°C</b><br/>',
+				valueDecimals: 1
+			},
+			connectNulls: true,
+		},{
+			name: 'Events',
+			type: 'flags',
+			data: eventSeries,
+			onSeries: 's1',
+		}],
+		exporting: {
+			buttons: {
+				printButton: {
+					enabled: false
+				},
+				exportButton: {
+					enabled: false
+				}
+			}
+		}
+	});
+}
+//-->
+</script>
