@@ -10,73 +10,93 @@
 	</div>
 	
 	<div id="picasa-user"></div>
+	<div id="picasa-albums"></div>
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript">
-function fetchAlbums()
-{
-	var username = $('#username').val();
-	if (username == '') {
-		return;
-	}
-	
-	$('#picasa-user').html('');
-	
-	var url = 'https://picasaweb.google.com/data/feed/api/user/' + username + '?alt=json&callback=?';
-	$.getJSON(url).success(function(data) {
-		showAlbums(data);
-	});
-	
-	/*
-	 * TODO: Error handling (complete/error callbacks) does not work with JSONP.
-	 * Try replacing with this: https://github.com/jaubourg/jquery-jsonp 
-	 */
-}
-
-function showAlbums(data)
-{
-	console.log(data.feed);
-	feed = data.feed;
-	
-	var author = {
-		name: feed.author[0].name.$t,
-		uri:  feed.author[0].uri.$t,
-		img:  feed.icon.$t,
-	};
-	
-	$('#picasa-user').append('<p><img src="' + author.img + '" /><a target="_blank" href="' + author.uri + '">' + feed.author[0].name.$t + '</a></p>');
-	$('#picasa-user').append('<table class="table table-bordered table-condensed"><colgroup><col style="width: 85px" /></colgroup><thead><tr><th>Thumb</th><th>Album name</th><th>Photos</th><th>Published</th></tr></thead><tbody></tbody></table>')
-	
-	for (key in feed.entry)
+	<script type="text/javascript">
+	function fetchAlbums()
 	{
-		var entry = feed.entry[key];
-		var album = {
-			id:     entry.id.$t,
-			uri:   entry.link[1].href,
-			title: entry.title.$t,
-			count: entry.gphoto$numphotos.$t,
-			thumb: entry.media$group.media$thumbnail[0].url,
-			pub:   new Date(entry.published.$t),
+		var username = $('#username').val();
+		if (username == '') {
+			return;
 		}
-		$('#picasa-user tbody').append(
-			'<tr>' + 
-				'<td><img style="width: 80px" src="' + album.thumb + '" /></td>' + 
-				'<td><a href="' + album.uri + '">' + album.title + '</a></td>' + 
-				'<td>' + album.count + ' photos</td>' +
-				'<td>' + formatDate(album.pub) + '</td>' +
-			'</tr>'
-		);
+		
+		$('#picasa-user').html('');
+		$('#picasa-albums').html('<p>Choose an album:</p>');
+		
+		var url = 'https://picasaweb.google.com/data/feed/api/user/' + username + '?alt=json&callback=?';
+		$.getJSON(url).success(function(data) {
+			showAlbums(data);
+		});
+		
+		/*
+		 * TODO: Error handling (complete/error callbacks) does not work with JSONP.
+		 * Try replacing with this: https://github.com/jaubourg/jquery-jsonp 
+		 */
 	}
-}
+	
+	function showAlbums(data)
+	{
+		feed = data.feed;
+		
+		var author = {
+			name: feed.author[0].name.$t,
+			uri:  feed.author[0].uri.$t,
+			img:  feed.icon.$t,
+		};
+		
+		$('#picasa-user').append('<p><img src="' + author.img + '" /><a target="_blank" href="' + author.uri + '">' + feed.author[0].name.$t + '</a></p>');
+		
+		for (key in feed.entry)
+		{
+			var entry = feed.entry[key];
+			var album = {
+				id:     entry.id.$t,
+				uri:   entry.link[1].href,
+				title: entry.title.$t,
+				count: entry.gphoto$numphotos.$t,
+				thumb: entry.media$group.media$thumbnail[0].url,
+				pub:   new Date(entry.published.$t),
+			}
+			
+			var image = $('<div class="picasa-album-img">')
+				.append('<img style="width: 80px" src="' + album.thumb + '" />');
+			
+			var text =  $('<div class="picasa-album-text">')
+				.append('<a href="' + album.uri + '">' + album.title + '</a><br/>')
+				.append(formatDate(album.pub) + '<br />');
+			
+			var linked = $('<a class="cell-link" href="#">')
+				.append(image).append(text);
+				
+			var item = $('<div class="span3 picasa-album">')
+				.append(linked)
+				.append('<div style="clear: both"></div>');
 
-function formatDate(date)
-{
-	var d = date.getDate();
-    var m = date.getMonth() + 1; // zero based
-    var y = date.getFullYear();
-    return(d + "." + m + "." + y + ".");	
-}
+			if (key % 4 == 0) {
+				if (row) {
+					$('#picasa-albums').append(row);
+				}
+				var row = $('<div class="row">');
+			}
+		
+			row.append(item);
+		}
+		
+		$('#picasa-albums').append(row);
+	}
+	
+	function formatDate(date)
+	{
+		var d = date.getDate();
+	    var m = date.getMonth() + 1; // zero based
+	    var y = date.getFullYear();
+	    return(
+	    	('00' + d).slice(-2) + "." + 
+	    	('00' + m).slice(-2) + "." + y + "."
+	    );	
+	}
 
 </script>
 {% endblock %}

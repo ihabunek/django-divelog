@@ -10,3 +10,12 @@ body { padding-top: 60px; }
 .container h1,
 .container h2,
 .container h3 { margin-bottom: 20px; }
+
+#picasa-albums {  }
+#picasa-albums .row {  }
+.picasa-album { background-color: whitesmoke; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; margin-top: 20px; }
+.picasa-album:hover { background-color: #DDD; }
+.picasa-album-img { padding: 8px; float: left;  }
+.picasa-album-text { padding: 5px; }
+
+.cell-link { display: block; width: 100%; height: 100%; text-decoration: none; color: #333; }
