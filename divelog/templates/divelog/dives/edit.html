@@ -11,7 +11,11 @@
 		<div class="control-group{% if field.errors %} error{% endif %}">
 			<label class="control-label" for="id_{{ field.html_name }}">{{ field.label }}</label>
 			<div class="controls">
-				{{ field }}
+				{% if field.name == 'location' %}
+					<input id="id_location" type="text" name="location" maxlength="256" autocomplete="off" data-provide="typeahead" data-items="{{ locations|length }}" data-source='["{{ locations|join:"\",\"" }}"]' value="{{ field.value }}"/>
+				{% else %}
+					{{ field }}
+				{% endif %}
 				{% for error in field.errors %}
 				<span class="help-inline">{{ error }}</span>
 				{% endfor %}

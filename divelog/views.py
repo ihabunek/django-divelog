@@ -1,5 +1,5 @@
 from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, ValidatingPasswordChangeForm
-from divelog.models import Dive, DiveUpload, Sample, Event, Location
+from divelog.models import Dive, DiveUpload, Sample, Event
 from divelog.parsers.libdc import parse_short, parse_full
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -127,7 +127,9 @@ def upload_import(request):
             return redirect('divelog.views.dive_list')
             
         except Exception as ex:
+            logging.error(ex)
             messages.error(request, "Import failed")
+            messages.error(request, ex)
             return redirect('divelog.views.upload_view', upload_id = upload_id)
     
         raise Http404
@@ -196,7 +198,9 @@ def dive_edit(request, dive_id):
     """
     View for editing dive data.
     """
-    dive_url = '/dive/%d' % int(dive_id)
+    
+    # Fetch locations for auto-completion
+    locations = Dive.objects.filter(user=request.user).exclude(location=u'').values_list('location', flat=True).distinct()
     
     if request.method == 'POST':
         dive = Dive.objects.get(pk = dive_id)
@@ -212,7 +216,7 @@ def dive_edit(request, dive_id):
     c = RequestContext(request, {
         'form': form,
         'dive_id': dive_id,
-        'dive_url': dive_url,
+        'locations': locations,
     });
     return HttpResponse(t.render(c))
 
