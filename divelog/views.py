@@ -1,5 +1,5 @@
 from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, ValidatingPasswordChangeForm
-from divelog.models import Dive, DiveUpload, Sample, Event
+from divelog.models import Dive, DiveUpload, Sample, Event, Location
 from divelog.parsers.libdc import parse_short, parse_full
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -59,26 +59,37 @@ def upload_view(request, upload_id):
     """
     Displays a single upload.
     """
-    upload = DiveUpload.objects.get(pk = upload_id)
-    file_size = os.path.getsize(upload.data.path)
-    
-    # Fetch fingerprints of existing user's dives for marking already uploaded dives
-    fingerprints = {}
-    dives = Dive.objects.filter(user = request.user).values_list('id', 'fingerprint')
-    for dive_id, fingerprint in dives:
-        fingerprints[fingerprint] = dive_id
-
-    # Parse the XML file
     try:
-        overview = parse_short(upload.data.path)
-    except Exception:
-        messages.error(request, "Uploaded data cannot be parsed.")
-        overview = []
+        upload = DiveUpload.objects.get(pk = upload_id)
+    except DiveUpload.DoesNotExist:
+        raise Http404
+
     
-    # Add dive_id for existing dives
-    for item in overview:
-        if item['fingerprint'] in fingerprints:
-            item['dive_id'] = fingerprints[item['fingerprint']]
+    if os.path.exists(upload.data.path):
+        file_size = os.path.getsize(upload.data.path)
+    
+        # Fetch fingerprints of existing user's dives for marking already uploaded dives
+        fingerprints = {}
+        dives = Dive.objects.filter(user = request.user).values_list('id', 'fingerprint')
+        for dive_id, fingerprint in dives:
+            fingerprints[fingerprint] = dive_id
+    
+        # Parse the XML file
+        try:
+            overview = parse_short(upload.data.path)
+        except Exception:
+            messages.error(request, "Uploaded data cannot be parsed.")
+            overview = []
+    
+        # Add dive_id for existing dives
+        for item in overview:
+            if item['fingerprint'] in fingerprints:
+                item['dive_id'] = fingerprints[item['fingerprint']]
+
+    else:
+        overview = None
+        file_size = None
+        messages.error(request, "The uploaded file has been deleted from the system.")
     
     t = loader.get_template('divelog/uploads/view.html')
     c = RequestContext(request, {
