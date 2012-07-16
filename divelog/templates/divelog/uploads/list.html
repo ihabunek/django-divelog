@@ -3,30 +3,27 @@
 {% block title %}Uploads{% endblock %}
 
 {% block content %}
-{% include "divelog/messages.html" %}
-
 {% if uploads %}
-<table id="uploads-table" class="table table-striped table-condensed table-bordered">
-	<thead>
-		<th>ID</th>
-		<th>Uploaded</th>
-		<th>Filename</th>
-		<th>Actions</th>
-	</thead>
-	<tbody>
-	{% for upload in uploads %}
-		<tr>
-			<td>{{ upload.id }}</td>
-			<td>{{ upload.uploaded|date:"Y-m-d H:i:s" }}</td>
-			<td>{{ upload.data }}</td>
-			<td>
-				<a href="{% url divelog.views.upload_view upload.id %}">View</a>
-			</td>
-		</tr>
-	{% endfor %}
-	</tbody>
-</table>
-
+	<table id="uploads-table" class="table table-striped table-condensed table-bordered">
+		<thead>
+			<th>ID</th>
+			<th>Uploaded</th>
+			<th>Filename</th>
+			<th>Actions</th>
+		</thead>
+		<tbody>
+		{% for upload in uploads %}
+			<tr>
+				<td>{{ upload.id }}</td>
+				<td>{{ upload.uploaded|date:"Y-m-d H:i:s" }}</td>
+				<td>{{ upload.data }}</td>
+				<td>
+					<a href="{% url divelog.views.upload_view upload.id %}">View</a>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
 {% else %}
     <p>No uploads.</p>
 {% endif %}

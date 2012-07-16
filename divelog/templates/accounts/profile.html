@@ -4,7 +4,6 @@
 {% block title %}User profile{% endblock %}
 
 {% block content %}
-	{% include "divelog/messages.html" %}
 	<div class="profile">
 		<img src="{% gravatar_image user size=120 %}" alt="Avatar for {{user.first_name}}" />
 		<p>{{ user.get_full_name }}<br />

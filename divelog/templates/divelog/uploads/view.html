@@ -4,8 +4,6 @@
 {% block title %}Upload review{% endblock %}
 
 {% block content %}
-{% include "divelog/messages.html" %}
-
 <table class="table table-bordered table-striped">
 	<colgroup>
 		<col class="span1" />
@@ -28,47 +26,49 @@
 </table>
 
 {% if overview %}
-<p>This is an overview of dives found in the uploaded dive log.</p>
-
-<p>Select the dives which you wish to import and click the <em>Import dives</em> button</p>
-
-<form action="{% url divelog.views.upload_import %}" method="POST">
-	{% csrf_token %}
-	<input type="hidden" name="upload_id" value="{{ upload.id }}" />
-	<table class="table table-bordered table-condensed">
-		<thead>
-			<tr>
-				<th>Number</th>
-				<th>Datetime</th>
-				<th>Dive time</th>
-				<th>Max. depth</th>
-				<th>Fingerprint</th>
-				<th>Size</th>
-				<th>Imported?</th>
-				<th>Import</th>
-			</tr>
-		</thead>
-{% for item in overview %}
-		<tr>
-			<td>{{ item.number }}</td>
-			<td>{{ item.datetime }}</td>
-			<td>{{ item.divetime }}</td>
-			<td>{{ item.maxdepth }}</td>
-			<td>{{ item.fingerprint }}</td>
-			<td>{{ item.size }}</td>
-			<td>{% if item.dive_id %}<a href="{% url divelog.views.dive_view item.dive_id %}">Dive #{{item.dive_id}}</a>{% endif %}</td>
-			<td><input type="checkbox" name="fingerprints" value="{{ item.fingerprint }}" /></td>
-		</tr>
-{% endfor %}
-	</table>
-
-	<p class="pull-right">
-		<button class="btn" onclick="$('input[type=checkbox]').attr('checked', true); return false;">All</button>
-		<button class="btn" onclick="$('input[type=checkbox]').attr('checked', false); return false;">None</button>
-		<button class="btn" onclick="$('input[type=checkbox]').each(function() { $(this).attr('checked', !$(this).attr('checked')); }); return false;">Toggle</button>
-	</p>
+	<p>This is an overview of dives found in the uploaded dive log.</p>
 	
-	<input type="submit" class="btn btn-primary" value="Import dives" />
-</form>
+	<p>Select the dives which you wish to import and click the <em>Import dives</em> button</p>
+	
+	<form action="{% url divelog.views.upload_import %}" method="POST">
+		{% csrf_token %}
+		<input type="hidden" name="upload_id" value="{{ upload.id }}" />
+		<table class="table table-bordered table-condensed">
+			<thead>
+				<tr>
+					<th>Number</th>
+					<th>Datetime</th>
+					<th>Dive time</th>
+					<th>Max. depth</th>
+					<th>Fingerprint</th>
+					<th>Size</th>
+					<th>Imported?</th>
+					<th>Import</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for item in overview %}
+				<tr>
+					<td>{{ item.number }}</td>
+					<td>{{ item.datetime }}</td>
+					<td>{{ item.divetime }}</td>
+					<td>{{ item.maxdepth }}</td>
+					<td>{{ item.fingerprint }}</td>
+					<td>{{ item.size }}</td>
+					<td>{% if item.dive_id %}<a href="{% url divelog.views.dive_view item.dive_id %}">Dive #{{item.dive_id}}</a>{% endif %}</td>
+					<td><input type="checkbox" name="fingerprints" value="{{ item.fingerprint }}" /></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	
+		<p class="pull-right">
+			<button class="btn" onclick="$('input[type=checkbox]').attr('checked', true); return false;">All</button>
+			<button class="btn" onclick="$('input[type=checkbox]').attr('checked', false); return false;">None</button>
+			<button class="btn" onclick="$('input[type=checkbox]').each(function() { $(this).attr('checked', !$(this).attr('checked')); }); return false;">Toggle</button>
+		</p>
+		
+		<input type="submit" class="btn btn-primary" value="Import dives" />
+	</form>
 {% endif %}
 {% endblock %}
