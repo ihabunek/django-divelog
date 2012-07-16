@@ -22,16 +22,16 @@ class DiveUploadForm(ModelForm):
         model = DiveUpload
         exclude = ('uploaded', 'user')
         
-        
-class UploadFileForm(forms.Form):
-    file = forms.FileField()
-
 class UserProfileForm(ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email')
 
 class ValidatingPasswordChangeForm(PasswordChangeForm):
+    """
+    A password change form which adds password validation. Currently only 
+    checks min length.
+    """
     MIN_LENGTH = 8
 
     def clean_new_password1(self):
@@ -41,3 +41,12 @@ class ValidatingPasswordChangeForm(PasswordChangeForm):
             raise forms.ValidationError("The new password must be at least %d characters long." % self.MIN_LENGTH)
 
         return password1
+    
+    
+class ImportForm1(forms.Form):
+    upload = forms.FileField()
+
+class ImportForm2(forms.Form):
+    def __init__(self, files, prefix, initial, data):
+        self.fields['bla'] = forms.CharField(label="Bla")
+
