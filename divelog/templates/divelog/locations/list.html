@@ -1,5 +1,5 @@
 {% extends "divelog/base.html" %}
-{% load divelog_filters %}
+{% load utils %}
 
 {% block title %}Locations{% endblock %}
 
@@ -33,6 +33,8 @@
 			{% endfor %}
 			</tbody>
 		</table>
+
+		<div id="location-map"></div>
 	{% else %}
 		<p>You currently have no locations.</p>
 		{% comment %}
@@ -41,4 +43,42 @@
 		</ul>
 		{% endcomment %}
 	{% endif %}
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBAQjfJirhkGgQiCdJnE1GaBcHHwmijsgs&sensor=false"></script>
+<script type="text/javascript">
+
+	var locations = [
+	{% for location in locations %}
+		{% if location.lat and location.lon %}
+			[{{location.lat}}, {{ location.lon }}, '{{ location.name }}'],
+		{% endif %}
+	{% endfor %}];
+
+	$(document).ready(function() {
+		var target = document.getElementById("location-map");
+		var map = new google.maps.Map(target, {
+			mapTypeId: google.maps.MapTypeId.HYBRID
+		});
+
+		var bounds = new google.maps.LatLngBounds();
+		for (key in locations) {
+			var lat  = locations[key][0]
+			var lon  = locations[key][1]
+			var name = locations[key][2]
+
+			position = new google.maps.LatLng(lat, lon);
+
+			new google.maps.Marker({
+				position: position,
+				map: map,
+				title: name,
+			});
+
+			bounds.extend(position);
+		}
+		map.fitBounds(bounds);
+	});
+</script>
 {% endblock %}
