@@ -1,5 +1,5 @@
-from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, ValidatingPasswordChangeForm,\
-    LocationForm
+from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, \
+    ValidatingPasswordChangeForm, LocationForm
 from divelog.models import Dive, DiveUpload, Sample, Event, Location
 from divelog.parsers import libdc, subsurface
 from django.contrib import messages
@@ -385,15 +385,6 @@ def location_edit(request, location_id):
     c = RequestContext(request, {
         'form': form,
     });
-    return HttpResponse(t.render(c))
-
-@login_required
-def profile(request):
-    """
-    Displays user's profile.
-    """
-    t = loader.get_template('accounts/profile.html')
-    c = RequestContext(request);
     return HttpResponse(t.render(c))
 
 def settings(request):
