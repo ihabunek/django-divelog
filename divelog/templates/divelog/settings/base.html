@@ -1,16 +1,22 @@
 {% extends "divelog/base.html" %}
-
-{% block title %}{% endblock %}
+{% load gravatar %}
+{% load utils %}
 
 {% block content %}
 <div class="row">
-	<div class="span3">
+	<div class="span4">
+		<div class="settings-profile">
+			<div class="settings-avatar">{% gravatar_image user 40 %}</div>
+			<strong>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</strong><br />
+			<span class="smaller">{{ user.email }}</span>
+			<div class="clearfix"></div>
+		</div>
 		<ul class="nav nav-list settings-sidenav">
-			<li><a href="{% url divelog.views.settings_account  %}">Account <i class="icon-chevron-right"></i></a></li>
-			<li><a href="{% url divelog.views.settings_password %}">Password <i class="icon-chevron-right"></i></a></li>
+			<li class="{% active request 'divelog.views.settings_account'  %}"><a href="{% url divelog.views.settings_account  %}">Account  <i class="icon-chevron-right"></i></a></li>
+			<li class="{% active request 'divelog.views.settings_password' %}"><a href="{% url divelog.views.settings_password %}">Password <i class="icon-chevron-right"></i></a></li>
 		</ul>
 	</div>
-	<div class="span9">
+	<div class="span8">
 		{% block settings_contents %}
 		{% endblock %}
 	</div>
