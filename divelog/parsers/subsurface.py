@@ -6,13 +6,12 @@ http://subsurface.hohndel.org/
 
 from datetime import datetime
 from xml.etree import cElementTree
-import cProfile
 import os
 
 #if __name__ == '__main__':
 #    os.environ['DJANGO_SETTINGS_MODULE'] = 'divelog.settings'
 
-from divelog.models import Dive, Sample, Event
+from divelog.models import Dive, Sample, Event, Location
 
 def parse_short(path):
     dives = []
@@ -21,7 +20,7 @@ def parse_short(path):
             if node.tag == "dive":
                 dive = {
                     'number': node.get('number'),
-                    'date_time': _datetime(node.get('date'), node.get('time')),
+                    'datetime': _datetime(node.get('date'), node.get('time')),
                     'duration': _duration(node.get('duration')),
                 }
                 for child in node:
@@ -39,7 +38,6 @@ def parse_short(path):
 
 def parse_full(path):
     dives = []
-    samples = []
     with open(path, 'r') as file:
         for event, node in cElementTree.iterparse(file):
             if node.tag == "dive":
@@ -48,7 +46,9 @@ def parse_full(path):
                 dive.date_time = _datetime(node.get('date'), node.get('time'))
                 dive.duration = _duration(node.get('duration'))
                 
+                location = None
                 samples = []
+                events = []
                 
                 for child in node:
                     if child.tag == 'depth':
@@ -57,10 +57,9 @@ def parse_full(path):
                     elif child.tag == 'temperature':
                         dive.temperature = _temp(child.get('water'))
                     elif child.tag == 'location':
-                        dive.location = child.text
+                        location = child.text
                     elif child.tag == 'sample':
                         sample = Sample()
-                        #sample.dive = dive
                         sample.time = _duration(child.get('time'))
                         sample.depth = _depth(child.get('depth'))
                         
@@ -72,8 +71,7 @@ def parse_full(path):
                             sample.temperature = samples[-1].temperature
 
                         samples.append(sample)
-
-                dives.append((dive, samples))
+                dives.append((dive, samples, events, location))
     return dives
 
 def _duration(value):
@@ -81,8 +79,8 @@ def _duration(value):
     Converts a given time duration to the equivalent number of seconds.
     @param value: A string in 'mm:ss min' format, e.g. '10:31 min'. 
     """
-    minutes = int(value[-6:-4])
-    seconds = int(value[:-7])
+    minutes = int(value[:-7])
+    seconds = int(value[-6:-4])
     return 60 * minutes + seconds 
 
 def _datetime(date, time):
@@ -104,11 +102,11 @@ def _temp(value):
 
 #def run():
 #    start = datetime.now()
-#    p = parse_full('d:/Dropbox/divecomputer/divelog-1.xml')
+#    p = parse_full("c:/Users/ihabunek/Documents/My Dropbox/divecomputer/divelog-xp.xml")
 #    end = datetime.now()
 #    print end - start
 #    print [(x[0], len(x[1])) for x in p]
 #
 #if __name__ == '__main__':
-##    run()
-#    cProfile.run('run()')
+#    run()
+##    cProfile.run('run()')

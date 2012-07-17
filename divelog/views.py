@@ -1,6 +1,6 @@
 from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, ValidatingPasswordChangeForm
-from divelog.models import Dive, DiveUpload, Sample, Event
-from divelog.parsers.libdc import parse_short, parse_full
+from divelog.models import Dive, DiveUpload, Sample, Event, Location
+from divelog.parsers import libdc, subsurface
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -66,28 +66,28 @@ def upload_view(request, upload_id):
         upload = DiveUpload.objects.get(pk = upload_id)
     except DiveUpload.DoesNotExist:
         raise Http404
-
     
     if os.path.exists(upload.data.path):
         file_size = os.path.getsize(upload.data.path)
     
-        # Fetch fingerprints of existing user's dives for marking already uploaded dives
-        fingerprints = {}
-        dives = Dive.objects.filter(user = request.user).values_list('id', 'fingerprint')
-        for dive_id, fingerprint in dives:
-            fingerprints[fingerprint] = dive_id
+#        # Fetch fingerprints of existing user's dives for marking already uploaded dives
+#        fingerprints = {}
+#        dives = Dive.objects.filter(user = request.user).values_list('id', 'fingerprint')
+#        for dive_id, fingerprint in dives:
+#            fingerprints[fingerprint] = dive_id
     
         # Parse the XML file
         try:
-            overview = parse_short(upload.data.path)
+            with open(upload.data.path) as input:
+                overview = subsurface.parse_short(upload.data.path)
         except Exception:
             messages.error(request, "Uploaded data cannot be parsed.")
             overview = []
     
-        # Add dive_id for existing dives
-        for item in overview:
-            if item['fingerprint'] in fingerprints:
-                item['dive_id'] = fingerprints[item['fingerprint']]
+#        # Add dive_id for existing dives
+#        for item in overview:
+#            if item['fingerprint'] in fingerprints:
+#                item['dive_id'] = fingerprints[item['fingerprint']]
 
     else:
         overview = None
@@ -106,8 +106,8 @@ def upload_view(request, upload_id):
 @never_cache
 def upload_import(request):
     if request.method == 'POST':
-        # Provided fingerprints identify dives which should be imported
-        fingerprints = request.POST.getlist('fingerprints')
+        # Provided numbers identify dives which should be imported
+        numbers = request.POST.getlist('numbers')
         upload_id = request.POST.get('upload_id')
         
         try:
@@ -115,14 +115,14 @@ def upload_import(request):
             logging.debug("Parsing dives from upload #%d" % int(upload_id))
 
             # TODO: Parse only requested dives to improve performance
-            dives = parse_full(upload.data.path)
+            dives = subsurface.parse_full(upload.data.path)
             logging.debug("Parsed %d dives" % len(dives))            
 
             # Save parsed dives
             count = 0
-            for dive, samples, events in dives:
-                if dive.fingerprint in fingerprints:
-                    _save_dive(request.user, dive, samples, events)
+            for dive, samples, events, sLocation in dives:
+                if unicode(dive.number) in numbers:
+                    _save_dive(request.user, dive, samples, events, sLocation)
                     count += 1
             
             logging.info("Saved %d dives" % count)
@@ -134,18 +134,28 @@ def upload_import(request):
             messages.error(request, "Import failed")
             messages.error(request, ex)
             return redirect('divelog.views.upload_view', upload_id = upload_id)
-    
-        raise Http404
         
-    t = loader.get_template('divelog/uploads/import.html')
+    t = loader.get_template('divelog/index.html')
     c = RequestContext(request, {})
     return HttpResponse(t.render(c))
 
 @transaction.commit_on_success
-def _save_dive(user, dive, samples, events):
+def _save_dive(user, dive, samples, events, sLocation):
     logging.info("Saving dive %s" % dive.fingerprint)
     
+    if sLocation:
+        locations = Location.objects.filter(name=sLocation)
+        if locations:
+            location = locations[0]
+        else:
+            location = Location()
+            location.name = sLocation
+            location.user = user
+            location.save()
+        dive.location = location
+    
     dive.user = user
+    dive.size = len(samples)
     dive.save()
     
     for sample in samples:
@@ -203,7 +213,7 @@ def dive_edit(request, dive_id):
     """
     
     # Fetch locations for auto-completion
-    locations = Dive.objects.filter(user=request.user).exclude(location=u'').values_list('location', flat=True).distinct()
+#    locations = Dive.objects.filter(user=request.user).exclude(location=None).values_list('location', flat=True).distinct()
     
     if request.method == 'POST':
         dive = Dive.objects.get(pk = dive_id)
@@ -219,7 +229,7 @@ def dive_edit(request, dive_id):
     c = RequestContext(request, {
         'form': form,
         'dive_id': dive_id,
-        'locations': locations,
+#        'locations': locations,
     });
     return HttpResponse(t.render(c))
 

@@ -11,10 +11,6 @@
 	</colgroup>
 	<tbody>
 		<tr>
-			<th>ID</th>
-			<td>{{ upload.id }}</td>
-		</tr>
-		<tr>
 			<th>File</th>
 			<td>{{ upload.data }}</td>
 		</tr>
@@ -24,7 +20,6 @@
 		</tr>
 	</tbody>
 </table>
-
 {% if overview %}
 	<p>This is an overview of dives found in the uploaded dive log.</p>
 	
@@ -40,23 +35,23 @@
 					<th>Datetime</th>
 					<th>Dive time</th>
 					<th>Max. depth</th>
-					<th>Fingerprint</th>
-					<th>Size</th>
-					<th>Imported?</th>
-					<th>Import</th>
+					<th>Avg. depth</th>
+					<th>Temperature</th>
+					<th>Location</th>
+					<th>Select</th>
 				</tr>
 			</thead>
 			<tbody>
 			{% for item in overview %}
 				<tr>
 					<td>{{ item.number }}</td>
-					<td>{{ item.datetime }}</td>
-					<td>{{ item.divetime }}</td>
-					<td>{{ item.maxdepth }}</td>
-					<td>{{ item.fingerprint }}</td>
-					<td>{{ item.size }}</td>
-					<td>{% if item.dive_id %}<a href="{% url divelog.views.dive_view item.dive_id %}">Dive #{{item.dive_id}}</a>{% endif %}</td>
-					<td><input type="checkbox" name="fingerprints" value="{{ item.fingerprint }}" /></td>
+					<td>{{ item.datetime|date:"d.m.Y H:i:s" }}</td>
+					<td class="right">{{ item.duration|formatTime }}</td>
+					<td class="right">{{ item.max_depth|floatformat:1 }} m</td>
+					<td class="right">{{ item.avg_depth|floatformat:1 }} m</td>
+					<td class="right">{{ item.temperature }}°C</td>
+					<td>{{ item.location }}</td>
+					<td><input type="checkbox" name="numbers" value="{{ item.number }}" /></td>
 				</tr>
 			{% endfor %}
 			</tbody>
