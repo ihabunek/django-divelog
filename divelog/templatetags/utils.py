@@ -7,9 +7,9 @@ from django.utils import simplejson
 register = template.Library()
 
 @register.simple_tag
-def active(request, view):
-    url = reverse(view)
-    return 'active' if request.path.startswith(url) else ''
+def active(request, view_name):
+    view_url = reverse(view_name)
+    return 'active' if request.path.startswith(view_url) else ''
 
 @register.filter
 def sec_to_min(seconds):
