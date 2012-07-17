@@ -11,10 +11,10 @@ DIVE_STATUS_DEFAULT = 'A'
 class Location(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=256)
-    lat = models.FloatField(blank = True, null = True)
-    lon = models.FloatField(blank = True, null = True)
+    lat = models.FloatField(blank = True, null = True, verbose_name = "Latitude")
+    lon = models.FloatField(blank = True, null = True, verbose_name = "Longitude")
     def __unicode__(self):
-        return self.name if self.name else ''  
+        return self.name
 
 class Dive(models.Model):
     user = models.ForeignKey(User)
