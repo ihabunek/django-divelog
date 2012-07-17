@@ -47,7 +47,7 @@
 					<td>{{ dive.location }}</td>
 					<td>{{ dive.date_time|date:"Y-m-d H:i:s" }}</td>
 					<td class="right">{{ dive.max_depth|floatformat:2 }} m</td>
-					<td class="right">{{ dive.duration|formatTime }}</td>
+					<td class="right">{{ dive.duration|sec_to_min }} min</td>
 					<td>
 						<a href="{% url divelog.views.dive_view dive.id %}">View</a>
 						<a href="{% url divelog.views.dive_edit dive.id %}">Edit</a>

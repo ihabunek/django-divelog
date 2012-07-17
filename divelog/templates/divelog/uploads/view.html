@@ -46,7 +46,7 @@
 				<tr>
 					<td>{{ item.number }}</td>
 					<td>{{ item.datetime|date:"d.m.Y H:i:s" }}</td>
-					<td class="right">{{ item.duration|formatTime }}</td>
+					<td class="right">{{ item.duration|sec_to_min }} min</td>
 					<td class="right">{{ item.max_depth|floatformat:1 }} m</td>
 					<td class="right">{{ item.avg_depth|floatformat:1 }} m</td>
 					<td class="right">{{ item.temperature }}°C</td>

@@ -15,19 +15,9 @@ import urllib
 register = template.Library()
 
 @register.filter
-def formatTime(time):
-    '''
-    Takes number of seconds as an integer, and returns the formatted duration.
-    '''
-    
-    minutes = math.floor(time / 60)
-    hours = math.floor(minutes / 60)
-    minutes -= hours * 60;
-    
-    if hours > 0:
-        return '%d h %02d min' % (hours, minutes)
-    else:
-        return '%02d min' % (minutes) 
+def sec_to_min(seconds):
+    "Returns number minutes in given number of seconds rounded to nearest int."
+    return int(round(seconds / 60))
 
 @register.filter
 def jsonify(input):
