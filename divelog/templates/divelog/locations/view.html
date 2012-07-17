@@ -1,0 +1,57 @@
+{% extends "divelog/base.html" %}
+{% load divelog_filters %}
+
+{% block title %}{{ location.name }}{% endblock %}
+
+{% block content %}
+	<table class="table table-bordered">
+		<colgroup>
+			<col class="span2" />
+			<col />
+		</colgroup>
+		<tbody>
+			<tr>
+				<th>Name</th>
+				<td>{{ location.name }}</td>
+			</tr>
+			<tr>
+				<th>Latitude</th>
+				<td>{{ location.lat }}</td>
+			</tr>
+			<tr>
+				<th>Longitude</th>
+				<td>{{ location.lon }}</td>
+			</tr>
+		</tbody>
+	</table>
+	{% if location.lat and location.lon %}
+		<div id="location-map"></div>
+	{% endif %}
+	<div class="pull-right">
+		<a class="btn" href="{% url divelog.views.location_edit location.id %}"><i class="icon-edit"></i> Edit</a>
+	</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBAQjfJirhkGgQiCdJnE1GaBcHHwmijsgs&sensor=false"></script>
+<script type="text/javascript">
+	{% if location.lat and location.lon %}
+		$(document).ready(function() {
+			var position = new google.maps.LatLng({{ location.lat }}, {{ location.lon }});
+			var myOptions = {
+				center: position,
+				zoom: 12,
+				mapTypeId: google.maps.MapTypeId.HYBRID
+			};
+			var map = new google.maps.Map(document.getElementById("location-map"), myOptions);
+			
+			// Place a marker
+			var marker = new google.maps.Marker({
+				position: position,
+				map: map,
+				title: "{{ location.name }}",
+			});
+		});
+	{% endif %}
+</script>
+{% endblock %}

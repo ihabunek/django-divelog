@@ -24,11 +24,14 @@ urlpatterns = patterns('',
     url(r'^dive/(?P<dive_id>\d+)/samples.json$', 'divelog.views.dive_samples_json'),
     url(r'^dive/(?P<dive_id>\d+)/events.json$', 'divelog.views.dive_events_json'),
 
+    url(r'^locations/$', 'divelog.views.location_list'),
+    url(r'^location/(?P<location_id>\d+)/$', 'divelog.views.location_view'),
+    url(r'^location/(?P<location_id>\d+)/edit/$', 'divelog.views.location_edit'),
+
     url(r'^uploads/$', 'divelog.views.upload_list'),
     url(r'^upload/new/$', 'divelog.views.upload_add'),
     url(r'^upload/import/$', 'divelog.views.upload_import'),
     url(r'^upload/(?P<upload_id>\d+)/$', 'divelog.views.upload_view'),
-    
     
     url(r'^accounts/login/?$', 'django.contrib.auth.views.login', { 'template_name': 'accounts/login.html'}),
     url(r'^accounts/logout/?$', 'django.contrib.auth.views.logout', { 'next_page': '/'}),

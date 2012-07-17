@@ -1,0 +1,132 @@
+{% extends "divelog/base.html" %}
+
+{% block title %}Edit location{% endblock %}
+
+{% block content %}
+<form class="form-horizontal" action="{{ request.get_full_path }}" method="post">
+	{% csrf_token %}
+	<fieldset>
+		{% for field in form %}
+		<div class="control-group{% if field.errors %} error{% endif %}">
+			<label class="control-label" for="id_{{ field.html_name }}">{{ field.label }}</label>
+			<div class="controls">
+				{{ field }}
+				{% for error in field.errors %}
+				<span class="help-inline">{{ error }}</span>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+		<div class="control-group">
+			<label class="control-label" >Map</label>
+			<div class="controls">
+				<p style="padding-top:5px;"><span class="help-inline">
+					Click to set marker or use search to find location on map.
+				</span></p>
+				<div id="location-map"></div>
+				<div class="form-inline">
+					<input type="text" name="search" id="search" placeholder="Find on map"/>
+					<button class="btn" onclick="findOnMap(); return false;">Search</button>
+					<button class="btn" onclick="centerMapOnUser(); return false;">My location</button>
+				</div>
+			</div>
+		</div>
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="Save" />
+			<a class="btn" href="{% url divelog.views.location_view form.instance.id %}">Cancel</a>
+		</div>
+	</fieldset>
+</form>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBAQjfJirhkGgQiCdJnE1GaBcHHwmijsgs&sensor=false"></script>
+<script type="text/javascript">
+	
+	var map;
+	var marker;
+	var geocoder;
+	{% if form.instance.lat and form.instance.lon %}
+	var initial = new google.maps.LatLng({{ form.instance.lat }}, {{ form.instance.lon }});
+	{% else %}
+	var initial = null;
+	{% endif %}
+	
+	var defaultPosition = new google.maps.LatLng(45.81500500, 15.97850100);
+	var defaultZoom = 4; 
+	
+	$(document).ready(function() {
+		
+		var target = document.getElementById("location-map");
+		
+		map = new google.maps.Map(target, {
+		{% if form.instance.lat and form.instance.lon %}
+			center: initial,
+			zoom: 12,
+		{% else %}
+			center: defaultPosition,
+			zoom: defaultZoom,
+		{% endif %}
+			mapTypeId: google.maps.MapTypeId.HYBRID
+		});
+		
+		if (initial) {
+			markSpot(initial, false);
+		}
+		
+		geocoder = new google.maps.Geocoder();
+		
+		google.maps.event.addListener(map, 'click', function(event) {
+			markSpot(event.latLng, false);
+		});
+	});
+	
+	function markSpot(position, centerMap) {
+		if (!marker) {
+			marker = new google.maps.Marker({
+				position: position,
+				map: map
+			});
+		} else {
+			marker.setPosition(position);
+		}
+		
+		if (centerMap) {
+			map.setCenter(position);
+		}
+		
+		$('#id_lat').val(position.lat().toFixed(8));
+		$('#id_lon').val(position.lng().toFixed(8));
+	}
+	
+	function centerMapOnUser() {
+		if(navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				userLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+				markSpot(userLocation, true);
+			}, function() {
+				console.error("Geolocation failed, rejected by user?");
+			});
+		} else {
+			console.error("Browser does not support geolocation");
+		}
+	}
+	
+	function findOnMap() {
+		search = $('#search').val();
+		if (search) {
+			geocoder.geocode({'address': search}, foundOnMap);
+		}
+	}
+	
+	function foundOnMap(results, status){
+		if (status == google.maps.GeocoderStatus.OK) {
+			mapLocation = results[0].geometry.location;
+			markSpot(mapLocation, true);
+			map.setZoom(10);
+		} else {
+			console.error("Geocode was not successful for the following reason: " + status);
+		}
+	}
+</script>
+{% endblock %}

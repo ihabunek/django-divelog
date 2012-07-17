@@ -3,7 +3,7 @@ Created on 9. 7. 2012.
 
 @author: ihabunek
 '''
-from divelog.models import Dive, DiveUpload
+from divelog.models import Dive, DiveUpload, Location
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
@@ -13,15 +13,17 @@ class DiveForm(ModelForm):
     class Meta:
         model = Dive
         exclude = ('number', 'fingerprint', 'size', 'user')
-#        widgets = {
-#            'duration': TimeInput(format="%H:%M"),
-#        }
 
 class DiveUploadForm(ModelForm):
     class Meta:
         model = DiveUpload
         exclude = ('uploaded', 'user')
-        
+
+class LocationForm(ModelForm):
+    class Meta:
+        model = Location
+        exclude = ('user')
+
 class UserProfileForm(ModelForm):
     class Meta:
         model = User

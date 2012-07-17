@@ -1,8 +1,11 @@
-from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, ValidatingPasswordChangeForm
+from divelog.forms import DiveForm, DiveUploadForm, UserProfileForm, ValidatingPasswordChangeForm,\
+    LocationForm
 from divelog.models import Dive, DiveUpload, Sample, Event, Location
 from divelog.parsers import libdc, subsurface
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.formtools.wizard.views import SessionWizardView
+from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, Http404
@@ -11,11 +14,9 @@ from django.template import loader
 from django.template.context import RequestContext
 from django.utils import timezone, simplejson
 from django.views.decorators.cache import never_cache
+from xml.etree.cElementTree import ParseError
 import logging
 import os
-from django.contrib.formtools.wizard.views import SessionWizardView
-from django.conf.global_settings import DEFAULT_FILE_STORAGE
-from django.core.files.storage import default_storage
 
 def index(request):
     t = loader.get_template('divelog/index.html')
@@ -129,10 +130,9 @@ def upload_import(request):
             messages.success(request, "Successfully imported %d dives." % count)
             return redirect('divelog.views.dive_list')
             
-        except Exception as ex:
+        except ParseError as ex:
             logging.error(ex)
-            messages.error(request, "Import failed")
-            messages.error(request, ex)
+            messages.error(request, "Failed parsing XML file.<br />Underlying error: %s" % ex.message)
             return redirect('divelog.views.upload_view', upload_id = upload_id)
         
     t = loader.get_template('divelog/index.html')
@@ -342,6 +342,50 @@ def dive_events_json(request, dive_id):
     ] for event in dive.event_set.all()] )
     
     return HttpResponse(samples, mimetype="application/json")
+
+def location_list(request):
+    locations = Location.objects.filter(user=request.user)
+
+    t = loader.get_template('divelog/locations/list.html')
+    c = RequestContext(request, {
+        'locations': locations
+    });
+    return HttpResponse(t.render(c))
+
+def location_view(request, location_id):
+    try:
+        location = Location.objects.get(pk = location_id)
+    except Location.DoesNotExist:
+        raise Http404
+    
+    if location.user != request.user:
+        raise Http404
+
+    t = loader.get_template('divelog/locations/view.html')
+    c = RequestContext(request, {
+        'location': location
+    });
+    return HttpResponse(t.render(c))
+
+def location_edit(request, location_id):
+    try:
+        location = Location.objects.get(pk = location_id)
+    except Location.DoesNotExist:
+        raise Http404
+    
+    if request.method == 'POST':
+        form = LocationForm(request.POST, instance = location)
+        if form.is_valid():
+            form.save()
+            return redirect('divelog.views.location_view', location_id = location_id)
+    else:
+        form = LocationForm(instance = location)
+    
+    t = loader.get_template('divelog/locations/edit.html')
+    c = RequestContext(request, {
+        'form': form,
+    });
+    return HttpResponse(t.render(c))
 
 @login_required
 def profile(request):

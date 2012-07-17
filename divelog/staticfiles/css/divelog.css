@@ -20,6 +20,8 @@ body { padding-top: 60px; }
 
 .cell-link { display: block; width: 100%; height: 100%; text-decoration: none; color: #333; }
 
+#location-map { width: 100%; height: 400px; margin: 20px 0 10px 0; }
+
 
 /* Sidebar navigation for settings pages 
 ------------------------------------------*/

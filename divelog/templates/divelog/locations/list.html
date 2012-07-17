@@ -1,0 +1,44 @@
+{% extends "divelog/base.html" %}
+{% load divelog_filters %}
+
+{% block title %}Locations{% endblock %}
+
+{% block content %}
+	{% if locations|length > 0 %}
+		<table id="locations-table" class="table table-striped table-condensed table-bordered">
+			<thead>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Latitude</th>
+				<th>Longitude</th>
+				<th>Dives</th>
+				<th>Actions</th>
+			</thead>
+			<tbody>
+			{% for location in locations %}
+				<tr>
+					<td>{{ location.id }}</td>
+					<td>{{ location.name }}</td>
+					<td>{{ location.lat }}</td>
+					<td>{{ location.lon }}</td>
+					<td>{{ location.dive_set.count }}</td>
+					<td>
+						<a href="{% url divelog.views.location_view location.id %}">View</a>
+						{% comment %}
+						<a href="{% url divelog.views.location_edit location.id %}">Edit</a>
+						<a href="{% url divelog.views.location_trash location.id %}">Trash</a>
+						{% endcomment %}
+					</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	{% else %}
+		<p>You currently have no locations.</p>
+		{% comment %}
+		<ul>
+		  <li><a href="{% url divelog.views.dive_add %}">Add a location</a></li>
+		</ul>
+		{% endcomment %}
+	{% endif %}
+{% endblock %}

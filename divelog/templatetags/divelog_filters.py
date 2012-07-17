@@ -17,7 +17,7 @@ register = template.Library()
 @register.filter
 def sec_to_min(seconds):
     "Returns number minutes in given number of seconds rounded to nearest int."
-    return int(round(seconds / 60))
+    return int(round(seconds / 60)) if seconds else ''
 
 @register.filter
 def jsonify(input):
