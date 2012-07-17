@@ -35,7 +35,6 @@ urlpatterns = patterns('',
     
     url(r'^accounts/login/?$', 'django.contrib.auth.views.login', { 'template_name': 'accounts/login.html'}),
     url(r'^accounts/logout/?$', 'django.contrib.auth.views.logout', { 'next_page': '/'}),
-    url(r'^accounts/profile/?$', 'divelog.views.profile'),
     
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
