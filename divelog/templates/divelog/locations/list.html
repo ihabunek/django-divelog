@@ -57,28 +57,38 @@
 	{% endfor %}];
 
 	$(document).ready(function() {
-		var target = document.getElementById("location-map");
-		var map = new google.maps.Map(target, {
-			mapTypeId: google.maps.MapTypeId.HYBRID
-		});
-
-		var bounds = new google.maps.LatLngBounds();
-		for (key in locations) {
-			var lat  = locations[key][0]
-			var lon  = locations[key][1]
-			var name = locations[key][2]
-
-			position = new google.maps.LatLng(lat, lon);
-
-			new google.maps.Marker({
-				position: position,
-				map: map,
-				title: name,
+		if (locations.length > 0) {
+			var target = document.getElementById("location-map");
+			var map = new google.maps.Map(target, {
+				mapTypeId: google.maps.MapTypeId.HYBRID
 			});
 
-			bounds.extend(position);
+			var bounds = new google.maps.LatLngBounds();
+			for (key in locations) {
+				var lat  = locations[key][0]
+				var lon  = locations[key][1]
+				var name = locations[key][2]
+
+				position = new google.maps.LatLng(lat, lon);
+
+				new google.maps.Marker({
+					position: position,
+					map: map,
+					title: name,
+				});
+
+				bounds.extend(position);
+			}
+
+			// For 1 location, center the map on the location
+			// For more locations, use bounds
+			if (locations.length == 1) {
+				map.setCenter(position);
+				map.setZoom(12);
+			} else {
+				map.fitBounds(bounds);
+			}
 		}
-		map.fitBounds(bounds);
 	});
 </script>
 {% endblock %}
