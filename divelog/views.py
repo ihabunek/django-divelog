@@ -343,6 +343,7 @@ def dive_events_json(request, dive_id):
     
     return HttpResponse(samples, mimetype="application/json")
 
+@login_required
 def location_list(request):
     locations = Location.objects.filter(user=request.user)
 
@@ -352,6 +353,7 @@ def location_list(request):
     });
     return HttpResponse(t.render(c))
 
+@login_required
 def location_view(request, location_id):
     try:
         location = Location.objects.get(pk = location_id)
@@ -367,6 +369,8 @@ def location_view(request, location_id):
     });
     return HttpResponse(t.render(c))
 
+@login_required
+@never_cache
 def location_edit(request, location_id):
     try:
         location = Location.objects.get(pk = location_id)
@@ -387,6 +391,7 @@ def location_edit(request, location_id):
     });
     return HttpResponse(t.render(c))
 
+@login_required
 def settings(request):
     return redirect('divelog.views.settings_account')
 
@@ -422,10 +427,7 @@ def settings_password(request):
     });
     return HttpResponse(t.render(c))
 
-
-#
-# Interesting extened example: http://djangosnippets.org/snippets/1454/
-#
+@login_required
 class ImportWizard(SessionWizardView):
     
     file_storage = default_storage
