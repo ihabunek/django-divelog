@@ -1,8 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from divelog.views import ImportWizard
-from divelog.forms import ImportForm1, ImportForm2
 
 admin.autodiscover()
 
@@ -38,11 +36,6 @@ urlpatterns = patterns('',
     
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-    
-    url(r'^wizard/$', ImportWizard.as_view([
-        ImportForm1,
-        ImportForm2,
-    ])),
 )
 
 # for development, see:

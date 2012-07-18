@@ -4,12 +4,10 @@ from divelog.models import Dive, DiveUpload, Sample, Event, Location
 from divelog.parsers import libdc, subsurface
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.formtools.wizard.views import SessionWizardView
-from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, Http404
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect
 from django.template import loader
 from django.template.context import RequestContext
 from django.utils import timezone, simplejson
@@ -426,19 +424,3 @@ def settings_password(request):
         'form': form,
     });
     return HttpResponse(t.render(c))
-
-@login_required
-class ImportWizard(SessionWizardView):
-    
-    file_storage = default_storage
-    
-    def get_template_names(self):
-        # use self.steps.current to get current step
-        logging.info(self.steps.current)
-        logging.info(self.steps.next)
-        return 'divelog/wizard/form.html'
-    
-    def done(self, form_list, **kwargs):
-        return render_to_response('divelog/wizard/done.html', {
-            'form_data': [form.cleaned_data for form in form_list],
-        })
