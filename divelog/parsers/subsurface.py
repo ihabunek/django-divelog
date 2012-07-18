@@ -6,12 +6,8 @@ http://subsurface.hohndel.org/
 
 from datetime import datetime
 from xml.etree import cElementTree
-import os
 
-#if __name__ == '__main__':
-#    os.environ['DJANGO_SETTINGS_MODULE'] = 'divelog.settings'
-
-from divelog.models import Dive, Sample, Event, Location
+from divelog.models import Dive, Sample
 
 def parse_short(path):
     dives = []
@@ -99,14 +95,3 @@ def _depth(value):
 def _temp(value):
     "Converts a temperature string '##.## C' to float"
     return float(value[:-2])
-
-#def run():
-#    start = datetime.now()
-#    p = parse_full("c:/Users/ihabunek/Documents/My Dropbox/divecomputer/divelog-xp.xml")
-#    end = datetime.now()
-#    print end - start
-#    print [(x[0], len(x[1])) for x in p]
-#
-#if __name__ == '__main__':
-#    run()
-##    cProfile.run('run()')
