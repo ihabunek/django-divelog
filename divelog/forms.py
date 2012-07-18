@@ -1,8 +1,3 @@
-'''
-Created on 9. 7. 2012.
-
-@author: ihabunek
-'''
 from divelog.models import Dive, DiveUpload, Location
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm

@@ -1,9 +1,3 @@
-'''
-Created on 4. 7. 2012.
-
-@author: ihabunek
-'''
-
 from django import template
 import md5
 import urllib

@@ -1,8 +1,3 @@
-'''
-Created on 3. 7. 2012.
-
-@author: ihabunek
-'''
 from divelog.models import Dive, Sample
 from django.contrib import admin
 
