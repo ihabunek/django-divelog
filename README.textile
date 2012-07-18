@@ -1,5 +1,3 @@
-Django DiveLog
-==============
+h1. Django DiveLog
 
 An online divelog application.
-

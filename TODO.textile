@@ -1,0 +1,7 @@
+h1. TODO List
+
+Thing to think about in case my brain forgets.
+
+* Open auth integration, see:
+** https://developers.google.com/accounts/docs/OpenID
+** http://pypi.python.org/pypi/python-openid/
