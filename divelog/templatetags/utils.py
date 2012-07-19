@@ -6,10 +6,16 @@ import json
 
 register = template.Library()
 
-@register.simple_tag
-def active(request, view_name):
-    view_url = reverse(view_name)
-    return 'active' if request.path.startswith(view_url) else ''
+@register.simple_tag(takes_context=True)
+def active(context, view_name):
+    """
+    Returns the string 'active' if the current request if for the given view. 
+    Otherwise returns an empty string. Used to mark links as acitve in 
+    navigation divs.
+    """
+    path = context['request'].path # request path
+    view_url = reverse(view_name)  # view path
+    return 'active' if path.startswith(view_url) else ''
 
 @register.filter
 def sec_to_min(seconds):
@@ -18,6 +24,7 @@ def sec_to_min(seconds):
 
 @register.filter
 def jsonify(input):
+    "Converts given input to a JSON string."
     if isinstance(input, QuerySet):
         return serialize('json', input)
     return json.dumps(input)
