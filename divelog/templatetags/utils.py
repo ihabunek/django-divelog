@@ -2,7 +2,7 @@ from django import template
 from django.core.serializers import serialize
 from django.core.urlresolvers import reverse
 from django.db.models.query import QuerySet
-from django.utils import simplejson
+import json
 
 register = template.Library()
 
@@ -20,4 +20,4 @@ def sec_to_min(seconds):
 def jsonify(input):
     if isinstance(input, QuerySet):
         return serialize('json', input)
-    return simplejson.dumps(input)
+    return json.dumps(input)
