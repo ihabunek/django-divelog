@@ -136,6 +136,10 @@ LOGGING = {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s',
             'datefmt': '%c',
         },
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s %(module)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
     },
     'filters': {
         'require_debug_false': {
@@ -148,11 +152,21 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
+            'propagate': True,
+        },
+        'app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     }

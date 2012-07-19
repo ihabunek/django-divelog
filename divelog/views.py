@@ -11,12 +11,14 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.template.context import RequestContext
 from django.utils import timezone, simplejson
+from django.utils.log import getLogger
 from django.views.decorators.cache import never_cache
 from xml.etree.cElementTree import ParseError
-import logging
 import os
 
 def index(request):
+    logger = getLogger('app')
+    logger.info("Loading index page")
     t = loader.get_template('divelog/index.html')
     c = RequestContext(request);
     return HttpResponse(t.render(c))
@@ -104,6 +106,8 @@ def upload_view(request, upload_id):
 @login_required
 @never_cache
 def upload_import(request):
+    logger = getLogger('app')
+
     if request.method == 'POST':
         # Provided numbers identify dives which should be imported
         numbers = request.POST.getlist('numbers')
@@ -111,11 +115,11 @@ def upload_import(request):
         
         try:
             upload = DiveUpload.objects.get(pk = upload_id)
-            logging.debug("Parsing dives from upload #%d" % int(upload_id))
+            logger.debug("Parsing dives from upload #%d" % int(upload_id))
 
             # TODO: Parse only requested dives to improve performance
             dives = subsurface.parse_full(upload.data.path)
-            logging.debug("Parsed %d dives" % len(dives))            
+            logger.debug("Parsed %d dives" % len(dives))
 
             # Save parsed dives
             count = 0
@@ -124,12 +128,12 @@ def upload_import(request):
                     _save_dive(request.user, dive, samples, events, sLocation)
                     count += 1
             
-            logging.info("Saved %d dives" % count)
+            logger.info("Saved %d dives" % count)
             messages.success(request, "Successfully imported %d dives." % count)
             return redirect('divelog.views.dive_list')
             
         except ParseError as ex:
-            logging.error(ex)
+            logger.error(ex)
             messages.error(request, "Failed parsing XML file.<br />Underlying error: %s" % ex.message)
             return redirect('divelog.views.upload_view', upload_id = upload_id)
         
@@ -139,7 +143,8 @@ def upload_import(request):
 
 @transaction.commit_on_success
 def _save_dive(user, dive, samples, events, sLocation):
-    logging.info("Saving dive %s" % dive.fingerprint)
+    logger = getLogger('app')
+    logger.info("Saving dive %s" % dive.fingerprint)
     
     if sLocation:
         locations = Location.objects.filter(name=sLocation)
