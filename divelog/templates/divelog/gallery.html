@@ -3,16 +3,17 @@
 {% block title %}Galleries{% endblock %}
 
 {% block content %}
+	<p>Enter a Picasa username to look for user's galleries:</p>
 	<div class="form-inline">
 		<input type="text" id="username" placeholder="Enter a picasa username..." value="ivan.habunek" />
 		<button class="btn" onclick="fetchAlbums();">Find</button>
 	</div>
 	
-	<div id="picasa-user"></div>
-	<div id="picasa-albums"></div>
+	<div id="picasa-target"></div>
 {% endblock %}
 
 {% block js %}
+	<script type="text/javascript" src="{{ STATIC_URL }}vendor/jquery.jsonp/jquery.jsonp-2.3.1.min.js"></script>
 	<script type="text/javascript">
 	function fetchAlbums()
 	{
@@ -21,80 +22,109 @@
 			return;
 		}
 		
-		$('#picasa-user').html('');
-		$('#picasa-albums').html('<p>Choose an album:</p>');
-		
-		var url = 'https://picasaweb.google.com/data/feed/api/user/' + username + '?alt=json&callback=?';
-		$.getJSON(url).success(function(data) {
-			showAlbums(data);
-		});
-		
+		// Clear the target div
+		$('#picasa-target').empty();
+
 		/*
-		 * TODO: Error handling (complete/error callbacks) does not work with JSONP.
-		 * Try replacing with this: https://github.com/jaubourg/jquery-jsonp 
+		 * Using jquery.jsonp (https://github.com/jaubourg/jquery-jsonp) 
+		 * because jquery has problems with jsonp e.g. no error handling.
 		 */
+		var url = 'https://picasaweb.google.com/data/feed/api/user/' + username + '?alt=json&callback=?';
+		$.jsonp({
+			url: url,
+			success: function(json, textStatus) {
+				console.log(json, textStatus);
+				showAlbums(json);
+			},
+			error: function(xOptions, textStatus) {
+				$('#picasa-target').append(
+					'<div class="alert alert-error">' +
+						'<a class="close" data-dismiss="alert" href="#">&times;</a>' +
+						'User <strong>' + username + '</strong> not found.' +
+					'</div>'
+				);
+			},
+			complete: function() {
+				
+			}
+		});
 	}
 	
 	function showAlbums(data)
 	{
-		feed = data.feed;
-		
 		var author = {
-			name: feed.author[0].name.$t,
-			uri:  feed.author[0].uri.$t,
-			img:  feed.icon.$t,
+			name: data.feed.author[0].name.$t,
+			uri:  data.feed.author[0].uri.$t,
+			img:  data.feed.icon.$t,
 		};
 		
-		$('#picasa-user').append('<p><img src="' + author.img + '" /><a target="_blank" href="' + author.uri + '">' + feed.author[0].name.$t + '</a></p>');
+		$('#picasa-target').append(
+			'<div class="picasa-user">' + 
+				'<img src="' + author.img + '" />' + author.name + '<br />' + 
+				'<a target="_blank" href="' + author.uri + '">View user\'s picasa page</a>' +
+				'<div class="clearfix"></div>' +
+			'</div>'
+		);
 		
-		for (key in feed.entry)
-		{
-			var entry = feed.entry[key];
-			var album = {
-				id:     entry.id.$t,
+		var albums = [];
+		var hiddenAlbums = [];
+		var ignoreTypes = ["Buzz", "ProfilePhotos", "ScrapBook"];
+		
+		for (key in data.feed.entry) {
+			var entry = data.feed.entry[key];
+
+			var hidden = false;
+			if (entry.hasOwnProperty('gphoto$albumType')) {
+				var type = $.trim(entry.gphoto$albumType.$t);
+				if ($.inArray(type, ignoreTypes) != -1) {
+					hidden = true;
+				}
+			}
+			
+			album = {
+				id:    entry.id.$t,
 				uri:   entry.link[1].href,
 				title: entry.title.$t,
 				count: entry.gphoto$numphotos.$t,
 				thumb: entry.media$group.media$thumbnail[0].url,
-				pub:   new Date(entry.published.$t),
+			};
+			
+			if (hidden) {
+				hiddenAlbums.push(album);
+			} else {
+				albums.push(album);
 			}
-			
-			var image = $('<div class="picasa-album-img">')
-				.append('<img style="width: 80px" src="' + album.thumb + '" />');
-			
-			var text =  $('<div class="picasa-album-text">')
-				.append('<a href="' + album.uri + '">' + album.title + '</a><br/>')
-				.append(formatDate(album.pub) + '<br />');
-			
-			var linked = $('<a class="cell-link" href="#">')
-				.append(image).append(text);
-				
-			var item = $('<div class="span3 picasa-album">')
-				.append(linked)
-				.append('<div style="clear: both"></div>');
+		}
+		
+		for (key in albums) {
+			album = albums[key];
 
-			if (key % 4 == 0) {
+			if (key % 3 == 0) {
 				if (row) {
-					$('#picasa-albums').append(row);
+					$('#picasa-target').append(row);
 				}
 				var row = $('<div class="row">');
 			}
-		
-			row.append(item);
+			
+			row.append(
+				'<div class="span4 picasa-album linked" onclick="selectAlbum(\'' + album.id + '\')">' +
+					'<div class="picasa-album-img">' +
+						'<img style="width: 80px" src="' + album.thumb + '" />' +
+					'</div>' +
+					'<div class="picasa-album-text">' +
+						'<span class="blue">' + album.title + '</span><br />' +
+						album.count + ' photos' +
+					'</div>' +
+					'<div class="clearfix"></div>' +
+				'</div>'
+			);
 		}
 		
-		$('#picasa-albums').append(row);
+		$('#picasa-target').append(row);
 	}
 	
-	function formatDate(date)
-	{
-		var d = date.getDate();
-	    var m = date.getMonth() + 1; // zero based
-	    var y = date.getFullYear();
-	    return(
-	    	('00' + d).slice(-2) + "." + 
-	    	('00' + m).slice(-2) + "." + y + "."
-	    );	
+	function selectAlbum(id) {
+		console.log(id)
 	}
 
 </script>

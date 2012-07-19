@@ -5,6 +5,10 @@ body { padding-top: 60px; }
 
 .smaller { font-size: smaller;}
 
+.blue { color: #08C }
+
+.linked { cursor: pointer; }
+
 .table th.left, .table td.left { text-align: left; }
 .table th.right, .table td.right { text-align: right; }
 .table th.center, .table td.center { text-align: center; }
@@ -13,8 +17,10 @@ body { padding-top: 60px; }
 .container h2,
 .container h3 { margin-bottom: 20px; }
 
-#picasa-albums {  }
-#picasa-albums .row {  }
+#picasa-target { margin-top: 20px; }
+
+.picasa-user { border: 1px solid #e5e5e5; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; margin: 0 10px 10px 0; padding: 10px; }
+.picasa-user img { float: left; margin-right: 10px; }
 .picasa-album { background-color: whitesmoke; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; margin-top: 20px; }
 .picasa-album:hover { background-color: #DDD; }
 .picasa-album-img { padding: 8px; float: left;  }
