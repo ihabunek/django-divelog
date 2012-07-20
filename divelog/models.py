@@ -33,6 +33,17 @@ class Dive(models.Model):
         choices = DIVE_STATUS_CHOICES, 
         default = DIVE_STATUS_DEFAULT
     )
+    
+    def trash(self):
+        self.status = 'D'
+        self.save()
+    
+    def restore(self):
+        self.status = 'A'
+        self.save()
+    
+    class Meta:
+        ordering = ['-date_time']
 
 class Sample(models.Model):
     dive = models.ForeignKey(Dive)

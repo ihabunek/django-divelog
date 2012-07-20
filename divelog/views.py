@@ -251,9 +251,7 @@ def dive_trash(request, dive_id):
     if dive.user != request.user:
         raise Http404
     
-    # Change status to Defunct
-    dive.status = 'D'
-    dive.save()
+    dive.trash()
     
     undo_url = reverse('divelog.views.dive_restore', args=[dive_id])
     messages.success(request, 'Dive #%d moved to trash. <a href="%s">Undo</a>' % (int(dive_id), undo_url))
@@ -271,9 +269,7 @@ def dive_restore(request, dive_id):
     if dive.user != request.user:
         raise Http404
     
-    # Change status to Active
-    dive.status = 'A'
-    dive.save()
+    dive.restore()
     
     messages.success(request, 'Dive #%d restored' % int(dive_id))
     return redirect('divelog.views.dive_list')
