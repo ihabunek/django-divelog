@@ -1,12 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-
-DIVE_STATUS_CHOICES = (
-    ('A', 'Active'),
-    ('D', 'Deleted')                      
-)
-
-DIVE_STATUS_DEFAULT = 'A'
+from django.utils.translation import ugettext_lazy as _
 
 class Location(models.Model):
     user = models.ForeignKey(User)
@@ -17,6 +11,13 @@ class Location(models.Model):
         return self.name
 
 class Dive(models.Model):
+    ACTIVE = 'A'
+    DEFUNCT = 'D'
+
+    STATUS_CHOICES = (
+        (ACTIVE, _('Active')),
+        (DEFUNCT, _('Trashed'))
+    )
     user = models.ForeignKey(User)
     number = models.IntegerField(default = 0)
     size = models.IntegerField(default = 0)
@@ -28,18 +29,17 @@ class Dive(models.Model):
     temperature = models.FloatField(blank = True, null = True)
     duration = models.IntegerField(null = True)
     comment = models.TextField(blank = True)
-    status = models.CharField(
-        max_length = 1, 
-        choices = DIVE_STATUS_CHOICES, 
-        default = DIVE_STATUS_DEFAULT
+    status = models.CharField(max_length = 1,
+        choices = STATUS_CHOICES,
+        default = ACTIVE
     )
     
     def trash(self):
-        self.status = 'D'
+        self.status = self.DEFUNCT
         self.save()
     
     def restore(self):
-        self.status = 'A'
+        self.status = self.ACTIVE
         self.save()
     
     class Meta:
