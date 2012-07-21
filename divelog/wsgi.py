@@ -13,12 +13,11 @@ middleware here, or combine a Django application with an application of another
 framework.
 
 """
-import os
-import sys
+from os import environ
+from os.path import basename, dirname
 
-sys.path.append('/home/ihabunek/www/django_divelog')
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "divelog.settings")
+settings_module = basename(dirname(__file__)) + '.settings'
+environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION

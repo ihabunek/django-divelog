@@ -19,3 +19,15 @@ try:
     }
 except ImportError:
     pass
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'divelog',
+        'USER': 'root',
+        'PASSWORD': 'starseed',
+        'HOST': '',
+        'PORT': '',
+    }
+}
+
