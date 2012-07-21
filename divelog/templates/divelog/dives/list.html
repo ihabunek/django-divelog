@@ -48,9 +48,9 @@
 					<td class="right">{{ dive.max_depth|floatformat:2 }} m</td>
 					<td class="right">{{ dive.duration|sec_to_min }} min</td>
 					<td>
-						<a href="{% url divelog.views.dive_view dive.id %}">View</a>
-						<a href="{% url divelog.views.dive_edit dive.id %}">Edit</a>
-						<a href="{% url divelog.views.dive_trash dive.id %}">Trash</a>
+						<a class="btn btn-mini" href="{% url divelog.views.dive_view dive.id %}"><i class="icon-search"></i> View</a>
+						<a class="btn btn-mini" href="{% url divelog.views.dive_edit dive.id %}"><i class="icon-edit"></i> Edit</a>
+						<a class="btn btn-mini" href="{% url divelog.views.dive_trash dive.id %}"><i class="icon-trash"></i> Trash</a>
 					</td>
 				</tr>
 			{% endfor %}
