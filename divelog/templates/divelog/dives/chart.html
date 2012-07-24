@@ -9,7 +9,7 @@ var eventSeries = [];
 
 $(document).ready(function() {
 	// Fetch dive samples
-	var diveReq = $.getJSON('{% url divelog.views.dive_samples_json dive.id %}', function(data) {
+	var diveReq = $.getJSON('{% url divelog_dive_samples_json dive.id %}', function(data) {
 		for (key in data)
 		{
 			time = data[key][0] * 1000 // time in ms
@@ -19,7 +19,7 @@ $(document).ready(function() {
 	});
 	
 	// Fetch dive events
-	var eventReq = $.getJSON('{% url divelog.views.dive_events_json dive.id %}', function(data) {
+	var eventReq = $.getJSON('{% url divelog_dive_events_json dive.id %}', function(data) {
 		for (key in data)
 		{
 			eventSeries.push({

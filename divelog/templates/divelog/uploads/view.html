@@ -25,7 +25,7 @@
 	
 	<p>Select the dives which you wish to import and click the <em>Import dives</em> button</p>
 	
-	<form action="{% url divelog.views.upload_import %}" method="POST">
+	<form action="{% url divelog_upload_import %}" method="POST">
 		{% csrf_token %}
 		<input type="hidden" name="upload_id" value="{{ upload.id }}" />
 		<table class="table table-bordered table-condensed">
