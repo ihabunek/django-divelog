@@ -42,18 +42,18 @@
 	</table>
 	
 	<div class="pull-right">
-		<a class="btn" href="{% url divelog.views.dive_edit dive.id %}"><i class="icon-edit"></i> Edit</a>
-		<a class="btn" href="{% url divelog.views.dive_trash dive.id %}" onclick="return confirm('Are you sure you want to delete this dive?')"><i class="icon-trash"></i> Trash</a>
+		<a class="btn" href="{% url divelog_dive_edit dive.id %}"><i class="icon-edit"></i> Edit</a>
+		<a class="btn" href="{% url divelog_dive_trash dive.id %}" onclick="return confirm('Are you sure you want to delete this dive?')"><i class="icon-trash"></i> Trash</a>
 	</div>
 	
 	{% if prev %}
-		<a class="btn" href="{% url divelog.views.dive_view prev %}"><i class="icon-hand-left"></i> Previous</a>
+		<a class="btn" href="{% url divelog_dive_view prev %}"><i class="icon-hand-left"></i> Previous</a>
 	{% else %}
 		<button class="btn" disabled="disabled"><i class="icon-hand-left"></i> Previous</button>
 	{% endif %}
 	
 	{% if next %}
-		<a class="btn" href="{% url divelog.views.dive_view next %}">Next <i class="icon-hand-right"></i></a>
+		<a class="btn" href="{% url divelog_dive_view next %}">Next <i class="icon-hand-right"></i></a>
 	{% else %}
 		<button class="btn" disabled="disabled">Next <i class="icon-hand-right"></i></button>
 	{% endif %}

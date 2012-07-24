@@ -23,10 +23,10 @@
 					<td>{{ location.lon }}</td>
 					<td>{{ location.dive_set.count }}</td>
 					<td>
-						<a href="{% url divelog.views.location_view location.id %}">View</a>
+						<a href="{% url divelog_location_view location.id %}">View</a>
 						{% comment %}
-						<a href="{% url divelog.views.location_edit location.id %}">Edit</a>
-						<a href="{% url divelog.views.location_trash location.id %}">Trash</a>
+						<a href="{% url divelog_location_edit location.id %}">Edit</a>
+						<a href="{% url divelog_location_trash location.id %}">Trash</a>
 						{% endcomment %}
 					</td>
 				</tr>
@@ -39,7 +39,7 @@
 		<p>You currently have no locations.</p>
 		{% comment %}
 		<ul>
-		  <li><a href="{% url divelog.views.dive_add %}">Add a location</a></li>
+		  <li><a href="{% url divelog_dive_add %}">Add a location</a></li>
 		</ul>
 		{% endcomment %}
 	{% endif %}

@@ -7,7 +7,7 @@
 <p>Currently, the only supported format is the XML export from 
 <a target="_blank" href="http://www.divesoftware.org/libdc/">libdivecomputer</a></p>
 
-<form class="form-horizontal" enctype="multipart/form-data" action="{% url divelog.views.upload_add %}" method="post">
+<form class="form-horizontal" enctype="multipart/form-data" action="{% url divelog_upload_add %}" method="post">
 	{% csrf_token %}
 	<fieldset>
 		<legend>Choose a file to upload</legend>

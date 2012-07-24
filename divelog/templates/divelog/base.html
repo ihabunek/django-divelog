@@ -20,12 +20,12 @@
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container">
-					<a class="brand" href="{% url divelog.views.index %}">Django DiveLog</a>
+					<a class="brand" href="{% url divelog_index %}">Django DiveLog</a>
 					<div class="nav-collapse">
 						<ul class="nav">
-							<li><a href="{% url divelog.views.dive_list %}">Dives</a></li>
-							<li><a href="{% url divelog.views.location_list %}">Locations</a></li>
-							<li><a href="{% url divelog.views.upload_list %}">Uploads</a></li>
+							<li><a href="{% url divelog_dive_list %}">Dives</a></li>
+							<li><a href="{% url divelog_location_list %}">Locations</a></li>
+							<li><a href="{% url divelog_upload_list %}">Uploads</a></li>
 						</ul>
 					</div>
 					<div class="btn-group pull-right">
@@ -35,7 +35,7 @@
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="{% url divelog.views.settings %}">Settings</a></li>
+							<li><a href="{% url divelog_settings_account %}">Settings</a></li>
 							<li><a href="{% url django.contrib.auth.views.logout %}">Sign Out</a></li>
 						</ul>
 					{% else %}

@@ -48,9 +48,9 @@
 					<td class="right">{{ dive.max_depth|floatformat:2 }} m</td>
 					<td class="right">{{ dive.duration|sec_to_min }} min</td>
 					<td>
-						<a class="btn btn-mini" href="{% url divelog.views.dive_view dive.id %}"><i class="icon-search"></i> View</a>
-						<a class="btn btn-mini" href="{% url divelog.views.dive_edit dive.id %}"><i class="icon-edit"></i> Edit</a>
-						<a class="btn btn-mini" href="{% url divelog.views.dive_trash dive.id %}"><i class="icon-trash"></i> Trash</a>
+						<a class="btn btn-mini" href="{% url divelog_dive_view dive.id %}"><i class="icon-search"></i> View</a>
+						<a class="btn btn-mini" href="{% url divelog_dive_edit dive.id %}"><i class="icon-edit"></i> Edit</a>
+						<a class="btn btn-mini" href="{% url divelog_dive_trash dive.id %}"><i class="icon-trash"></i> Trash</a>
 					</td>
 				</tr>
 			{% endfor %}
@@ -59,8 +59,8 @@
 	{% else %}
 		<p>You currently have no dives.</p>
 		<ul>
-		  <li><a href="{% url divelog.views.dive_add %}">Add a dive</a></li>
-		  <li><a href="{% url divelog.views.upload_list %}">Upload divelog</a></li>
+		  <li><a href="{% url divelog_dive_add %}">Add a dive</a></li>
+		  <li><a href="{% url divelog_upload_list %}">Upload divelog</a></li>
 		</ul>
 	{% endif %}
 {% endblock %}

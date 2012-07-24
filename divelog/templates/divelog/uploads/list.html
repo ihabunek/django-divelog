@@ -18,7 +18,7 @@
 				<td>{{ upload.uploaded|date:"Y-m-d H:i:s" }}</td>
 				<td>{{ upload.data }}</td>
 				<td>
-					<a href="{% url divelog.views.upload_view upload.id %}">View</a>
+					<a href="{% url divelog_upload_view upload.id %}">View</a>
 				</td>
 			</tr>
 		{% endfor %}
@@ -28,5 +28,5 @@
     <p>No uploads.</p>
 {% endif %}
 
-<p><a class="btn" href="{% url divelog.views.upload_add %}"><i class="icon-upload"></i> New upload</a></p>
+<p><a class="btn" href="{% url divelog_upload_add %}"><i class="icon-upload"></i> New upload</a></p>
 {% endblock %}

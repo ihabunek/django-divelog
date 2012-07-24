@@ -5,31 +5,30 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 admin.autodiscover()
 
 urlpatterns = patterns('divelog.views',
-    url(r'^/?$', 'index'),
-    url(r'^gallery/$', 'gallery'),
+    url(r'^/?$',       'main.index',   name='divelog_index'),
+    url(r'^gallery/$', 'main.gallery', name='divelog_gallery'),
     
-    url(r'^settings/$', 'settings'),
-    url(r'^settings/account/$', 'settings_account'),
-    url(r'^settings/password/$', 'settings_password'),
+    url(r'^settings/$',          'main.settings'),
+    url(r'^settings/account/$',  'main.settings_account',  name='divelog_settings_account'),
+    url(r'^settings/password/$', 'main.settings_password', name='divelog_settings_password'),
     
-    url(r'^dives/?$', 'dive_list'),
-    url(r'^dives/new/?$', 'dive_add'),
+    url(r'^dives/$',                             'dives.dive_list',         name='divelog_dive_list'),
+    url(r'^dives/new/$',                         'dives.dive_add',          name='divelog_dive_add'),
+    url(r'^dive/(?P<dive_id>\d+)/$',             'dives.dive_view',         name='divelog_dive_view'),
+    url(r'^dive/(?P<dive_id>\d+)/edit/$',        'dives.dive_edit',         name='divelog_dive_edit'),
+    url(r'^dive/(?P<dive_id>\d+)/trash/$',       'dives.dive_trash',        name='divelog_dive_trash'),
+    url(r'^dive/(?P<dive_id>\d+)/restore/$',     'dives.dive_restore',      name='divelog_dive_restore'),
+    url(r'^dive/(?P<dive_id>\d+)/samples.json$', 'dives.dive_samples_json', name='divelog_dive_samples_json'),
+    url(r'^dive/(?P<dive_id>\d+)/events.json$',  'dives.dive_events_json',  name='divelog_dive_events_json'),
     
-    url(r'^dive/(?P<dive_id>\d+)/$', 'dive_view'),
-    url(r'^dive/(?P<dive_id>\d+)/edit/$', 'dive_edit'),
-    url(r'^dive/(?P<dive_id>\d+)/trash/$', 'dive_trash'),
-    url(r'^dive/(?P<dive_id>\d+)/restore/$', 'dive_restore'),
-    url(r'^dive/(?P<dive_id>\d+)/samples.json$', 'dive_samples_json'),
-    url(r'^dive/(?P<dive_id>\d+)/events.json$', 'dive_events_json'),
+    url(r'^locations/$',                          'locations.location_list', name='divelog_location_list'),
+    url(r'^location/(?P<location_id>\d+)/$',      'locations.location_view', name='divelog_location_view'),
+    url(r'^location/(?P<location_id>\d+)/edit/$', 'locations.location_edit', name='divelog_location_edit'),
 
-    url(r'^locations/$', 'location_list'),
-    url(r'^location/(?P<location_id>\d+)/$', 'location_view'),
-    url(r'^location/(?P<location_id>\d+)/edit/$', 'location_edit'),
-
-    url(r'^uploads/$', 'upload_list'),
-    url(r'^upload/new/$', 'upload_add'),
-    url(r'^upload/import/$', 'upload_import'),
-    url(r'^upload/(?P<upload_id>\d+)/$', 'upload_view'),
+    url(r'^uploads/$',                   'uploads.upload_list',   name='divelog_upload_list'),
+    url(r'^upload/new/$',                'uploads.upload_add',    name='divelog_upload_add'),
+    url(r'^upload/import/$',             'uploads.upload_import', name='divelog_upload_import'),
+    url(r'^upload/(?P<upload_id>\d+)/$', 'uploads.upload_view',   name='divelog_upload_view'),
 )
 
 urlpatterns += patterns('',
