@@ -1,19 +1,18 @@
 {% extends "divelog/base.html" %}
 
-{% block title %}Edit dive details{% endblock %}
+{% block title %}Edit dive #{{ form.instance.id }}{% endblock %}
 
 {% block content %}
-<form class="form-horizontal" action="{{ request.get_full_path }}" method="post">
+<form class="form-horizontal" action="" method="post">
 	{% csrf_token %}
 	<fieldset>
+		<legend>Dive details</legend>
 		{% for field in form %}
 		<div class="control-group{% if field.errors %} error{% endif %}">
 			<label class="control-label" for="id_{{ field.html_name }}">{{ field.label }}</label>
 			<div class="controls">
 				{{ field }}
-				{% for error in field.errors %}
-				<span class="help-inline">{{ error }}</span>
-				{% endfor %}
+				{{ field.errors }}
 			</div>
 		</div>
 		{% endfor %}
