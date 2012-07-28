@@ -1,7 +1,8 @@
 *.pyc
-/*/settings/local.py
-/*/static/
-/*/media/
+/divelog/settings/local.py
+/divelog/static/
+/divelog/media/
 /dev.db
 .settings
 tmp
+env
