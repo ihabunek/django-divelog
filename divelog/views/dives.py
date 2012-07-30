@@ -15,13 +15,7 @@ def dive_view(request, dive_id):
     """
     Displays a single dive.
     """
-    try:
-        dive = Dive.objects.get(pk = dive_id)
-    except Dive.DoesNotExist:
-        raise Http404
-    
-    if dive.user != request.user:
-        raise Http404
+    dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     
     # Find next and previous dives (if any exist)
     next = Dive.objects.filter(user = request.user, date_time__gt = dive.date_time).order_by('date_time')[0:1]
@@ -54,19 +48,18 @@ def dive_edit(request, dive_id):
     """
     View for editing dive data.
     """
-    
+    dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
+
     # Fetch locations for auto-completion
 #    locations = Dive.objects.filter(user=request.user).exclude(location=None).values_list('location', flat=True).distinct()
-    
+
     if request.method == 'POST':
-        dive = Dive.objects.get(pk = dive_id)
-        form = DiveForm(request.POST, instance = dive)
+        form = DiveForm(request.POST, instance=dive)
         if form.is_valid():
             form.save()
             return redirect('divelog_dive_view', dive_id = dive_id)
     else:
-        dive = Dive.objects.get(pk = dive_id)
-        form = DiveForm(instance = dive)
+        form = DiveForm(instance=dive)
     
     t = loader.get_template('divelog/dives/edit.html')
     c = RequestContext(request, {
@@ -82,15 +75,7 @@ def dive_trash(request, dive_id):
     """
     Moves a dive to trash (changes dive status to D).
     """
-    try:
-        dive = Dive.objects.get(pk = dive_id)
-    except Dive.DoesNotExist:
-        raise Http404
-    
-    # Prevent deleting other people's dives
-    if dive.user != request.user:
-        raise Http404
-    
+    dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     dive.trash()
     
     undo_url = reverse('divelog_dive_restore', args=[dive_id])
@@ -100,15 +85,7 @@ def dive_trash(request, dive_id):
 @login_required
 @never_cache
 def dive_restore(request, dive_id):
-    try:
-        dive = Dive.objects.get(pk = dive_id)
-    except Dive.DoesNotExist:
-        raise Http404
-    
-    # Prevent deleting other people's dives
-    if dive.user != request.user:
-        raise Http404
-    
+    dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     dive.restore()
     
     messages.success(request, 'Dive #%d restored' % int(dive_id))
@@ -146,13 +123,7 @@ def dive_samples_json(request, dive_id):
     """
     Returns dive samples in JSON format.
     """
-    try:
-        dive = Dive.objects.get(pk = dive_id)
-    except Dive.DoesNotExist:
-        raise Http404
-    
-    if dive.user != request.user:
-        raise Http404
+    dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     
     samples = simplejson.dumps([[
         sample.time,
@@ -167,13 +138,7 @@ def dive_events_json(request, dive_id):
     """
     Returns dive events in JSON format.
     """
-    try:
-        dive = Dive.objects.get(pk = dive_id)
-    except Dive.DoesNotExist:
-        raise Http404
-    
-    if dive.user != request.user:
-        raise Http404
+    dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     
     samples = simplejson.dumps([[
         event.time,

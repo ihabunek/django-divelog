@@ -2,7 +2,7 @@ from divelog.forms import LocationForm
 from divelog.models import Location
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.template import loader
 from django.template.context import RequestContext
 from django.views.decorators.cache import never_cache
@@ -19,14 +19,7 @@ def location_list(request):
 
 @login_required
 def location_view(request, location_id):
-    try:
-        location = Location.objects.get(pk = location_id)
-    except Location.DoesNotExist:
-        raise Http404
-    
-    if location.user != request.user:
-        raise Http404
-
+    location = get_object_or_404(Location, pk=location_id, user=request.user)
     t = loader.get_template('divelog/locations/view.html')
     c = RequestContext(request, {
         'location': location
@@ -36,10 +29,7 @@ def location_view(request, location_id):
 @login_required
 @never_cache
 def location_edit(request, location_id):
-    try:
-        location = Location.objects.get(pk = location_id)
-    except Location.DoesNotExist:
-        raise Http404
+    location = get_object_or_404(Location, pk=location_id, user=request.user)
     
     if request.method == 'POST':
         form = LocationForm(request.POST, instance = location)

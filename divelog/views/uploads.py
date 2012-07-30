@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.template import loader
 from django.template.context import RequestContext
 from django.utils import timezone
@@ -49,11 +49,8 @@ def upload_view(request, upload_id):
     """
     Displays a single upload.
     """
-    try:
-        upload = DiveUpload.objects.get(pk = upload_id)
-    except DiveUpload.DoesNotExist:
-        raise Http404
-    
+    upload = get_object_or_404(DiveUpload, pk=upload_id, user=request.user)
+
     if os.path.exists(upload.data.path):
         file_size = os.path.getsize(upload.data.path)
     
@@ -99,8 +96,9 @@ def upload_import(request):
         numbers = request.POST.getlist('numbers')
         upload_id = request.POST.get('upload_id')
         
+        upload = get_object_or_404(DiveUpload, pk=upload_id, user=request.user)
+
         try:
-            upload = DiveUpload.objects.get(pk = upload_id)
             logger.debug("Parsing dives from upload #%d" % int(upload_id))
 
             # TODO: Parse only requested dives to improve performance
@@ -122,10 +120,8 @@ def upload_import(request):
             logger.error(ex)
             messages.error(request, "Failed parsing XML file.<br />Underlying error: %s" % ex.message)
             return redirect('divelog_upload_view', upload_id = upload_id)
-        
-    t = loader.get_template('divelog/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+
+    raise Http404
 
 @transaction.commit_on_success
 def _save_dive(user, dive, samples, events, sLocation):
