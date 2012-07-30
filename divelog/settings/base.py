@@ -1,6 +1,7 @@
 # Django settings
 
 import os.path
+from django.core.urlresolvers import reverse_lazy
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 PROJECT_NAME = os.path.basename(ROOT_DIR)
@@ -13,6 +14,10 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
+
+# The URL where requests are redirected after login when the contrib.auth.login 
+# view gets no next parameter.
+LOGIN_REDIRECT_URL = reverse_lazy('divelog_index')
 
 # Local time zone for this installation. Choican be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
