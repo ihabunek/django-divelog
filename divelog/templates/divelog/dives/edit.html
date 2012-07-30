@@ -1,21 +1,24 @@
 {% extends "divelog/base.html" %}
+{% load bs_forms %}
 
 {% block title %}Edit dive #{{ form.instance.id }}{% endblock %}
 
 {% block content %}
-<form class="form-horizontal" action="" method="post">
-	{% csrf_token %}
+<form id="edit_dive_form" class="form-horizontal" method="post">{% csrf_token %}
 	<fieldset>
 		<legend>Dive details</legend>
-		{% for field in form %}
-		<div class="control-group{% if field.errors %} error{% endif %}">
-			<label class="control-label" for="id_{{ field.html_name }}">{{ field.label }}</label>
-			<div class="controls">
-				{{ field }}
-				{{ field.errors }}
-			</div>
-		</div>
-		{% endfor %}
+		{% bs_field form.date_time %}
+		{% bs_field form.location %}
+
+		<legend>Statistics</legend>
+		{% bs_field form.duration %}
+		{% bs_field form.max_depth %}
+		{% bs_field form.avg_depth %}
+		{% bs_field form.temperature %}
+
+		<legend>Personal</legend>
+		{% bs_field form.comment %}
+
 		<div class="form-actions">
 			<input type="submit" class="btn btn-primary" value="Save" />
 			<a class="btn" href="{% url divelog_dive_view form.instance.id %}">Cancel</a>
