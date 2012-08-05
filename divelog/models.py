@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.aggregates import Avg, Max, Min
 
 class Location(models.Model):
     user = models.ForeignKey(User)
@@ -45,6 +46,17 @@ class Dive(models.Model):
     class Meta:
         ordering = ['-date_time']
 
+def dive_stats(dive_id):
+    "Calculates dive statistics from it's sample data."
+    return Sample.objects.filter(dive_id=dive_id).aggregate(
+        avg_depth = Avg('depth'),
+        max_depth = Max('depth'),
+        min_temp = Min('temperature'),
+        max_temp = Max('temperature'),
+        avg_temp = Avg('temperature'),
+        duration = Max('time'),
+    )
+
 class Sample(models.Model):
     dive = models.ForeignKey(Dive)
     time = models.IntegerField()
@@ -60,4 +72,3 @@ class DiveUpload(models.Model):
     user = models.ForeignKey(User)
     data = models.FileField(upload_to = 'uploads/%Y%m')
     uploaded = models.DateTimeField()
-    

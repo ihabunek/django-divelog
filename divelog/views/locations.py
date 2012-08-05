@@ -1,5 +1,5 @@
 from divelog.forms import LocationForm
-from divelog.models import Location
+from divelog.models import Location, Dive
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, get_object_or_404
@@ -14,6 +14,16 @@ def location_list(request):
     t = loader.get_template('divelog/locations/list.html')
     c = RequestContext(request, {
         'locations': locations
+    });
+    return HttpResponse(t.render(c))
+
+@login_required
+def location_dives(request, location_id):
+    dives = Dive.objects.filter(user=request.user, location_id=location_id)
+
+    t = loader.get_template('divelog/dives/list.html')
+    c = RequestContext(request, {
+        'dives': dives
     });
     return HttpResponse(t.render(c))
 

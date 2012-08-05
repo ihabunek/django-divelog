@@ -1,5 +1,5 @@
 from divelog.forms import DiveForm
-from divelog.models import Dive
+from divelog.models import Dive, dive_stats
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -9,6 +9,7 @@ from django.template import loader
 from django.template.context import RequestContext
 from django.utils import simplejson
 from django.views.decorators.cache import never_cache
+import json
 
 @login_required
 def dive_view(request, dive_id):
@@ -146,3 +147,8 @@ def dive_events_json(request, dive_id):
     ] for event in dive.event_set.all()] )
     
     return HttpResponse(samples, mimetype="application/json")
+
+@login_required
+def dive_stats_json(request, dive_id):
+    stats = json.dumps(dive_stats(dive_id))
+    return HttpResponse(stats, mimetype="application/json")
