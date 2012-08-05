@@ -33,6 +33,10 @@ body { padding-top: 60px; }
 /* Fix for google maps controls which are mangled by bootstrap. */
 .gmnoprint img { max-width: inherit; }
 
+
+#edit_dive_form #id_comment { width: 80% }
+
+
 /* User settings 
 ---------------------------------*/
 .settings-profile { border: 1px solid #e5e5e5; -webkit-border-radius: 6px; -moz-border-radius: 6px; border-radius: 6px; margin: 0 10px 10px 0; padding: 10px; }

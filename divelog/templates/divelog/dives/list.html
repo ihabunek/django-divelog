@@ -14,7 +14,8 @@
 		<script>
 		$(document).ready(function() {
 		    $('#dives-table').dataTable({
-		   		"iDisplayLength": 25,
+				"iDisplayLength": 25,
+				"bStateSave": true,
 		   		
 		   		// Styles which make use of twitter bootstrap
 		   		"sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
@@ -37,6 +38,7 @@
 				<th>Date</th>
 				<th class="right">Max. depth</th>
 				<th class="right">Duration</th>
+				<th class="right">Temperature</th>
 				<th>Actions</th>
 			</thead>
 			<tbody>
@@ -47,6 +49,7 @@
 					<td>{{ dive.date_time|date:"Y-m-d H:i:s" }}</td>
 					<td class="right">{{ dive.max_depth|floatformat:2 }} m</td>
 					<td class="right">{{ dive.duration|sec_to_min }} min</td>
+					<td class="right">{{ dive.temperature }}°C</td>
 					<td>
 						<a class="btn btn-mini" href="{% url divelog_dive_view dive.id %}"><i class="icon-search"></i> View</a>
 						<a class="btn btn-mini" href="{% url divelog_dive_edit dive.id %}"><i class="icon-edit"></i> Edit</a>

@@ -12,7 +12,7 @@
 		<tbody>
 			<tr>
 				<th>Location</th>
-				<td>{{ dive.location }}</td>
+				<td><a href="{% url divelog_location_view dive.location.id %}">{{ dive.location.name }}</a></td>
 			</tr>
 			<tr>
 				<th>Datetime</th>
