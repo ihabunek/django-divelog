@@ -5,9 +5,8 @@ http://subsurface.hohndel.org/
 """
 
 from datetime import datetime
-from xml.etree import cElementTree
-
 from divelog.models import Dive, Sample
+from xml.etree import cElementTree
 
 def parse_short(path):
     dives = []
@@ -59,12 +58,20 @@ def parse_full(path):
                         sample.time = _duration(child.get('time'))
                         sample.depth = _depth(child.get('depth'))
                         
-                        # Parse the temperature or copy from last sample if not present
-                        temp = child.get('temp')
-                        if temp:
-                            sample.temperature = _temp(temp)
+                        # Parse the temperature and pressure (or copy from 
+                        #  last sample if not present)
+                        temperature = child.get('temp')
+                        pressure = child.get('pressure')
+
+                        if temperature:
+                            sample.temperature = _temp(temperature)
                         elif samples:
                             sample.temperature = samples[-1].temperature
+
+                        if pressure:
+                            sample.pressure = _pressure(pressure)
+                        elif samples:
+                            sample.pressure = samples[-1].pressure
 
                         samples.append(sample)
                 dives.append((dive, samples, events, location))
@@ -95,3 +102,7 @@ def _depth(value):
 def _temp(value):
     "Converts a temperature string '##.## C' to float"
     return float(value[:-2])
+
+def _pressure(value):
+    "Converts a pressure string '##.## bar' to float"
+    return float(value[:-4])

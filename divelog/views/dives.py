@@ -3,11 +3,10 @@ from divelog.models import Dive, dive_stats
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.template import loader
 from django.template.context import RequestContext
-from django.utils import simplejson
 from django.views.decorators.cache import never_cache
 import json
 
@@ -126,10 +125,11 @@ def dive_samples_json(request, dive_id):
     """
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     
-    samples = simplejson.dumps([[
+    samples = json.dumps([[
         sample.time,
         sample.depth, 
-        sample.temperature
+        sample.temperature,
+        sample.pressure
     ] for sample in dive.sample_set.all()] )
     
     return HttpResponse(samples, mimetype="application/json")
@@ -141,7 +141,7 @@ def dive_events_json(request, dive_id):
     """
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     
-    samples = simplejson.dumps([[
+    samples = json.dumps([[
         event.time,
         event.text, 
     ] for event in dive.event_set.all()] )

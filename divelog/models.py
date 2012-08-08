@@ -62,6 +62,7 @@ class Sample(models.Model):
     time = models.IntegerField()
     depth = models.FloatField()
     temperature = models.FloatField(null=True)
+    pressure = models.FloatField(null=True)
     
 class Event(models.Model):
     dive = models.ForeignKey(Dive)
