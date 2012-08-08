@@ -1,3 +1,6 @@
+<!-- Dive data with pressures, from subsurface mailing list. -->
+<dives>
+<program name='subsurface' version='1'></program>
 <dive number='362' date='2012-02-21' time='13:54:08' duration='62:00 min'>
   <depth max='28.29 m' mean='17.454 m' />
   <temperature water='29.0 C' />
@@ -379,3 +382,4 @@
   <sample time='61:50 min' depth='2.38 m' />
   <sample time='62:00 min' depth='1.42 m' pressure='54.5 bar' />
 </dive>
+</dives>
