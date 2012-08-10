@@ -32,7 +32,7 @@ class BootstrapModelForm(ModelForm):
 class DiveForm(BootstrapModelForm):
     class Meta:
         model = Dive
-        exclude = ('number', 'fingerprint', 'size', 'user')
+        exclude = ('number', 'fingerprint', 'size', 'user', 'status')
 
 class DiveUploadForm(BootstrapModelForm):
     class Meta:

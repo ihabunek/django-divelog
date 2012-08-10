@@ -13,30 +13,30 @@
 			<tr>
 				<th>Location</th>
 				<td><a href="{% url divelog_location_view dive.location.id %}">{{ dive.location.name }}</a></td>
-			</tr>
-			<tr>
 				<th>Datetime</th>
 				<td>{{ dive.date_time|date:"d.m.Y. H:i:s" }}</td>
 			</tr>
 			<tr>
-				<th>Maximum depth</th>
-				<td>{{ dive.max_depth }} m</td>
+				<th>Buddy</th>
+				<td>{{ dive.buddy }}</td>
+				<th>Divemaster</th>
+				<td>{{ dive.divemaster }}</td>
 			</tr>
 			<tr>
+				<th>Maximum depth</th>
+				<td>{{ dive.max_depth }} m</td>
 				<th>Average depth</th>
 				<td>{{ dive.avg_depth }} m</td>
 			</tr>
 			<tr>
 				<th>Temperature</th>
 				<td>{{ dive.temperature }}°C</td>
-			</tr>
-			<tr>
 				<th>Duration</th>
 				<td>{{ dive.duration|sec_to_min }} min</td>
 			</tr>
 			<tr>
-				<th>Description</th>
-				<td>{{ dive.comment }}</td>
+				<th colspan="2">Description</th>
+				<td colspan="2">{{ dive.comment }}</td>
 			</tr>
 		</tbody>
 	</table>

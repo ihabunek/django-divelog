@@ -1,5 +1,6 @@
 {% extends "divelog/base.html" %}
 {% load bs_forms %}
+{% load utils %}
 
 {% block title %}Edit dive #{{ form.instance.id }}{% endblock %}
 
@@ -7,9 +8,16 @@
 <form id="edit_dive_form" class="form-horizontal" method="post">{% csrf_token %}
 	<fieldset>
 		<legend>Dive details</legend>
-		{% bs_field form.date_time %}
-		{% bs_field form.location %}
-
+		<div class="row">
+			<div class="span5">
+				{% bs_field form.date_time %}
+				{% bs_field form.location %}
+			</div>
+			<div class="span4">
+				{% bs_field form.buddy %}
+				{% bs_field form.divemaster %}
+			</div>
+		</div>
 		<legend>Statistics</legend>
 		{% bs_field form.duration %}
 		{% bs_field form.max_depth %}
@@ -25,4 +33,18 @@
 		</div>
 	</fieldset>
 </form>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+<!--
+// Add typeahead functionality to buddy and divemaster fields
+$('#id_buddy, #id_divemaster')
+	.attr('autocomplete', 'off')
+	.attr('data-provide', 'typeahead');
+
+$('#id_buddy').attr('data-source', '{{ buddies|jsonify }}');
+$('#id_divemaster').attr('data-source', '{{ divemasters|jsonify }}');
+-->
+</script>
 {% endblock %}

@@ -9,6 +9,8 @@ from django.template import loader
 from django.template.context import RequestContext
 from django.views.decorators.cache import never_cache
 import json
+from django.utils.log import getLogger
+from logging import getLoggerClass
 
 @login_required
 def dive_view(request, dive_id):
@@ -16,11 +18,11 @@ def dive_view(request, dive_id):
     Displays a single dive.
     """
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
-    
+
     # Find next and previous dives (if any exist)
     next = Dive.objects.filter(user = request.user, date_time__gt = dive.date_time).order_by('date_time')[0:1]
     prev = Dive.objects.filter(user = request.user, date_time__lt = dive.date_time).order_by('-date_time')[0:1]
-    
+
     t = loader.get_template('divelog/dives/view.html')
     c = RequestContext(request, {
         'dive': dive,
@@ -50,8 +52,9 @@ def dive_edit(request, dive_id):
     """
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
 
-    # Fetch locations for auto-completion
-#    locations = Dive.objects.filter(user=request.user).exclude(location=None).values_list('location', flat=True).distinct()
+    # Fetch existing buddies & divemasters for auto-completion
+    buddies = Dive.objects.filter(user=request.user).exclude(buddy='').values_list('buddy', flat=True).order_by('buddy').distinct()
+    divemasters = Dive.objects.filter(user=request.user).exclude(divemaster='').values_list('divemaster', flat=True).order_by('divemaster').distinct()
 
     if request.method == 'POST':
         form = DiveForm(request.POST, instance=dive)
@@ -60,12 +63,12 @@ def dive_edit(request, dive_id):
             return redirect('divelog_dive_view', dive_id = dive_id)
     else:
         form = DiveForm(instance=dive)
-    
+
     t = loader.get_template('divelog/dives/edit.html')
     c = RequestContext(request, {
         'form': form,
-        'dive_id': dive_id,
-#        'locations': locations,
+        'buddies': list(buddies),
+        'divemasters': list(divemasters),
     });
     return HttpResponse(t.render(c))
 
@@ -77,7 +80,7 @@ def dive_trash(request, dive_id):
     """
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     dive.trash()
-    
+
     undo_url = reverse('divelog_dive_restore', args=[dive_id])
     messages.success(request, 'Dive #%d moved to trash. <a href="%s">Undo</a>' % (int(dive_id), undo_url))
     return redirect('divelog_dive_list')
@@ -87,7 +90,7 @@ def dive_trash(request, dive_id):
 def dive_restore(request, dive_id):
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
     dive.restore()
-    
+
     messages.success(request, 'Dive #%d restored' % int(dive_id))
     return redirect('divelog_dive_list')
 
@@ -102,7 +105,7 @@ def dive_add(request):
         form.instance.user = request.user
         form.instance.number = 1
         form.instance.size = 0
- 
+
         if form.is_valid():
             new_dive = form.save()
             messages.success(request, "New dive added.")
@@ -111,7 +114,7 @@ def dive_add(request):
             messages.error(request, "Failed saving dive.")
     else:
         form = DiveForm()
-    
+
     t = loader.get_template('divelog/dives/add.html')
     c = RequestContext(request, {
         'form': form,
@@ -124,14 +127,14 @@ def dive_samples_json(request, dive_id):
     Returns dive samples in JSON format.
     """
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
-    
+
     samples = json.dumps([[
         sample.time,
-        sample.depth, 
+        sample.depth,
         sample.temperature,
         sample.pressure
     ] for sample in dive.sample_set.all()] )
-    
+
     return HttpResponse(samples, mimetype="application/json")
 
 @login_required
@@ -140,12 +143,12 @@ def dive_events_json(request, dive_id):
     Returns dive events in JSON format.
     """
     dive = get_object_or_404(Dive, pk=dive_id, user=request.user)
-    
+
     samples = json.dumps([[
         event.time,
-        event.text, 
+        event.text,
     ] for event in dive.event_set.all()] )
-    
+
     return HttpResponse(samples, mimetype="application/json")
 
 @login_required

@@ -24,6 +24,8 @@ class Dive(models.Model):
     size = models.IntegerField(default = 0)
     fingerprint = models.CharField(max_length = 32, blank = True)
     location = models.ForeignKey(Location, blank=True, null=True)
+    buddy = models.CharField(max_length = 100, blank = True)
+    divemaster = models.CharField(max_length = 100, blank = True)
     max_depth = models.FloatField(blank = True, null = True)
     avg_depth = models.FloatField(blank = True, null = True)
     date_time = models.DateTimeField(blank = True, null = True)
