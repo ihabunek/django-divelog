@@ -10,9 +10,12 @@
 		{% if next %}
 			<input type="hidden" name="next" value="{{ next }}" />
 		{% endif %}
-		{% bs_fields form.visible_fields %}
-		<div class="form-actions">
-			<input class="btn btn-primary" type="submit" value="Login" />
-	    </div>
+		<fieldset>
+			<legend>User credentials</legend>
+			{% bs_fields form.visible_fields %}
+			<div class="form-actions">
+				<input class="btn btn-primary" type="submit" value="Login" />
+		    </div>
+	    </fieldset>
 	</form>
 {% endblock %}

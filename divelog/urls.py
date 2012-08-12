@@ -34,8 +34,8 @@ urlpatterns = patterns('divelog.views',
 )
 
 urlpatterns += patterns('',
-    url(r'^accounts/login/?$', 'django.contrib.auth.views.login', { 'template_name': 'accounts/login.html'}),
-    url(r'^accounts/logout/?$', 'django.contrib.auth.views.logout', { 'next_page': '/'}),
+    url(r'^accounts/login/?$', 'django.contrib.auth.views.login', { 'template_name': 'divelog/login.html'}, name='divelog_login'),
+    url(r'^accounts/logout/?$', 'django.contrib.auth.views.logout', { 'next_page': '/'}, name='divelog_logout'),
     
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
