@@ -17,13 +17,35 @@ body { padding-top: 60px; }
 .container h2,
 .container h3 { margin-bottom: 20px; }
 
+/* Tables
+---------------------*/
+tr.selected td { background-color: lemonchiffon !important; }
+
+
+/* Context menu
+---------------------*/
+
+.contextMenu { position: absolute; width: 120px; z-index: 99999; border: solid 1px #CCC; background: #EEE; padding: 0px; margin: 0px; display: none; }
+.contextMenu li { list-style: none; padding: 0px; margin: 0px; }
+.contextMenu a { color: #333; text-decoration: none; display: block; line-height: 20px; height: 20px; background-position: 6px center; background-repeat: no-repeat; outline: none; padding: 1px 5px; padding-left: 28px; }
+.contextmenu li.hover a { color: #FFF; background-color: #3399FF; }
+.contextmenu li.disabled a { color: #AAA; cursor: default; }
+.contextMenu LI.hover.disabled A { background-color: transparent; }
+.contextMenu LI.separator { border-top: solid 1px #CCC; }
+
+
+/* Gallery picker
+---------------------*/
+
+#pickerModal .modal-body { min-height: 300px; }
 #picasa-target { margin-top: 20px; }
 
 .picasa-user { border: 1px solid #e5e5e5; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; margin: 0 10px 10px 0; padding: 10px; }
 .picasa-user img { float: left; margin-right: 10px; }
-.picasa-album { background-color: whitesmoke; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; margin-top: 20px; }
-.picasa-album:hover { background-color: #DDD; }
+.picasa-album { background-color: whitesmoke; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; margin-top: 10px; }
+.picasa-album.linked:hover { background-color: #DDD; }
 .picasa-album-img { padding: 8px; float: left;  }
+.picasa-album-img img { width: 60px; height: auto; }
 .picasa-album-text { padding: 5px; }
 
 .cell-link { display: block; width: 100%; height: 100%; text-decoration: none; color: #333; }
@@ -33,11 +55,10 @@ body { padding-top: 60px; }
 /* Fix for google maps controls which are mangled by bootstrap. */
 .gmnoprint img { max-width: inherit; }
 
-
 #edit_dive_form #id_comment { width: 80% }
 
 
-/* User settings 
+/* User settings
 ---------------------------------*/
 .settings-profile { border: 1px solid #e5e5e5; -webkit-border-radius: 6px; -moz-border-radius: 6px; border-radius: 6px; margin: 0 10px 10px 0; padding: 10px; }
 .settings-avatar { float: left; margin-right: 10px; }
