@@ -41,6 +41,10 @@ urlpatterns += patterns('',
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 )
 
+urlpatterns += patterns('',
+    (r'^pages/', include('django.contrib.flatpages.urls')),
+)
+
 # for development, see:
 # https://docs.djangoproject.com/en/dev/howto/static-files/#staticfiles-development
 urlpatterns += staticfiles_urlpatterns()

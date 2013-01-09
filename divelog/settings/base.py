@@ -118,6 +118,7 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
+	'django.contrib.flatpages',
     'django.contrib.formtools',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -125,6 +126,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+	'django.contrib.markup',
     'divelog',
     'south',
 )

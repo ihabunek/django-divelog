@@ -1,0 +1,9 @@
+{% extends "divelog/base.html" %}
+
+{% load markup %}
+
+{% block title %}{{ flatpage.title }}{% endblock %}
+
+{% block content %}
+{% filter markdown %}{{ flatpage.content }}{% endfilter %}
+{% endblock %}
