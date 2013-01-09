@@ -16,7 +16,7 @@
 			<div id="gPicker1">
 				<h4>Enter Google+ (Picasa) user name</h4>
 				<div class="form-inline">
-					<input type="text" id="username" placeholder="Enter a picasa username..." value="ivan.habunek" />
+					<input type="text" id="username" placeholder="Enter a picasa username..." />
 					<button class="btn">Find</button>
                     <div class="error"></div>
 				</div>
@@ -45,35 +45,39 @@
 		}).on('show', function() {
 			resetModal();
             $('#username').focus();
-			$('#username').val('ivan.habunek'); // for trial
 		});
 
-		// First step:
-		// Search for user, proceeed to next step or show error if not found
-		$('#gPicker1 button').on('click', function() {
-
-            // Remove any existing alerts
-            $('#gPicker1 .alert').remove();
-
-            // Search for user
-            username = $('#username').val();
-            $.jsonp({
-                url: 'https://picasaweb.google.com/data/feed/api/user/' + username + '?alt=json&callback=?',
-                success: function(json, textStatus) {
-                    displayAlbums(json, $('#gPicker2'));
-                    $('#gPicker1').hide();
-                    $('#gPicker2').show();
-                },
-                error: function(xOptions, textStatus) {
-                    // User not found. Probably. TODO: check which error
-                    $('#gPicker1 .error').html('<div class="alert">' +
-                        '<button type="button" class="close" data-dismiss="alert">×</button>' +
-                        'User <strong>' + username + '</strong> not found.' +
-                        '</div>');
-                }
-            });
+		// Map to find button or Enter key press
+		$('#gPicker1 button').on('click', findUser);
+		$('#username').keypress(function(event) {
+			if (event.which == 13) {
+				findUser();
+			}
 		});
 	});
+
+	/** Search for user, proceeed to next step or show error if not found */
+	function findUser() {
+		// Remove any existing alerts
+        $('#gPicker1 .alert').remove();
+
+		username = $('#username').val();
+		$.jsonp({
+			url: 'https://picasaweb.google.com/data/feed/api/user/' + username + '?alt=json&callback=?',
+			success: function(json, textStatus) {
+				displayAlbums(json, $('#gPicker2'));
+				$('#gPicker1').hide();
+				$('#gPicker2').show();
+			},
+			error: function(xOptions, textStatus) {
+				// User not found. Probably. TODO: check which error
+				$('#gPicker1 .error').html('<div class="alert">' +
+					'<button type="button" class="close" data-dismiss="alert">×</button>' +
+					'User <strong>' + username + '</strong> not found.' +
+					'</div>');
+			}
+		});
+	}
 
 	function resetModal() {
 		$('#gPicker1').show();
